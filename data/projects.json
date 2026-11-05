@@ -27,7 +27,8 @@
       ],
       "repo": "https://github.com/josucobucci/ZIP4ZIP",
       "demo": null,
-      "episodes": [
+      "prototype": true,
+      "features": [
         {
           "title": "Descoberta por proximidade",
           "desc": "Cada anúncio guarda a localização do celular. A distância é calculada pela fórmula de Haversine e a lista é ordenada do mais perto pro mais longe.",
@@ -103,8 +104,7 @@
             "GitHub Actions"
           ]
         }
-      ],
-      "prototype": true
+      ]
     },
     {
       "id": "clubix",
@@ -132,7 +132,7 @@
         "VoIP SIP"
       ],
       "repo": null,
-      "episodes": [
+      "features": [
         {
           "title": "Chat em tempo real",
           "desc": "Conversas por WebSocket com Django Channels e Redis. As mensagens chegam na hora para cliente e atendente, sem recarregar a página.",
@@ -246,7 +246,7 @@
         "Observabilidade"
       ],
       "repo": null,
-      "episodes": [
+      "features": [
         {
           "title": "Versão 1: IA 100% local, só CPU",
           "desc": "Qwen 2.5 (7B) conversava, um modelo de 3B reescrevia as perguntas e o RAG usava embeddings nomic-embed-text via Ollama. Funcionava, mas com média de ~10 s e máxima de ~51 s por resposta.",

@@ -17,7 +17,7 @@ python3 -m http.server 8000
 Tudo vem de [`data/projects.json`](data/projects.json):
 
 - `projects[]`: cada projeto vira um card. O que tiver `"featured": true` vai pro banner principal.
-- `episodes[]`: as features do projeto. Cada uma vira um card na fileira "feature por feature" e aparece listada no modal.
+- `features[]`: as features do projeto. Cada uma vira um card na fileira "feature por feature" e aparece listada no modal.
 - `prototype`: `true` abre o protótipo de celular do projeto (o `id` precisa existir em `prototype.js`, `proto-clubix.js` ou `proto-hal.js`).
 - `demo`: URL de uma versão web real (iframe), alternativa ao protótipo. Sem `prototype` nem `demo`, o botão aparece como "Demo em breve".
 - `repo`: link do GitHub. Com `null`, a página mostra "Código privado".

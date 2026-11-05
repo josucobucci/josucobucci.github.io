@@ -26,7 +26,7 @@ async function init() {
     return;
   }
   renderTopbar();
-  renderHero(DATA.projects.find(p => p.featured) || DATA.projects[0]);
+  renderHero([...DATA.projects].sort((x, y) => Boolean(y.featured) - Boolean(x.featured)));
   renderRows();
   renderFooter();
   setupModal();
@@ -53,18 +53,21 @@ function demoButton(p, label = 'Explorar o app') {
     : `<span class="btn btn-primary" aria-disabled="true" title="A versão web interativa está sendo preparada">${ICONS.play} Demo em breve</span>`;
 }
 
-function renderHero(p) {
-  const hero = $('#hero');
-  hero.style.setProperty('--hero-accent', p.accent);
-  hero.innerHTML = `
+// Banner: carrossel automático com uma série (projeto) por slide.
+// O tempo de cada slide (7 s) é a duração da animação "hero-fill" no styles.css.
+let heroIdx = 0;
+const heroPause = new Set();
+
+function heroSlide(p, i, n) {
+  return `<article class="hero-slide" style="--hero-accent:${esc(p.accent)}" aria-roledescription="slide" aria-label="${i + 1} de ${n}: ${esc(p.title)}">
     <div>
-      <div class="hero-kicker"><b>●</b> Projeto em destaque</div>
+      <div class="hero-kicker"><b>●</b> Série em destaque</div>
       <h1 class="hero-title">${esc(p.title)}</h1>
       <div class="hero-meta">
         <span>${esc(p.year)}</span>
         <span class="badge ${hasDemo(p) ? 'live' : ''}">${p.prototype ? 'PROTÓTIPO INTERATIVO' : p.demo ? 'DEMO AO VIVO' : esc(p.status)}</span>
         <span>${esc(p.category)}</span>
-        <span>${p.episodes?.length || 0} features</span>
+        <span>${p.features?.length || 0} features</span>
       </div>
       <p class="hero-tagline">${esc(p.tagline)}</p>
       <p class="hero-desc">${esc(p.description)}</p>
@@ -73,8 +76,65 @@ function renderHero(p) {
         <button class="btn btn-ghost" data-open="${esc(p.id)}">${ICONS.info} Mais informações</button>
       </div>
     </div>
-    <div class="hero-visual">${phoneHtml(p, false)}</div>`;
+    <div class="hero-visual">${phoneHtml(p, false)}</div>
+  </article>`;
+}
+
+function renderHero(list) {
+  const hero = $('#hero'), n = list.length;
+  hero.innerHTML = `
+    <div class="hero-track">${list.map((p, i) => heroSlide(p, i, n)).join('')}</div>
+    ${n > 1 ? `<button class="hero-arrow left" aria-label="Série anterior" data-hero="-1">‹</button>
+    <button class="hero-arrow right" aria-label="Próxima série" data-hero="1">›</button>
+    <div class="hero-dots" role="tablist" aria-label="Séries em destaque">${list.map((p, i) => `<button class="hero-dot" role="tab" data-hero-go="${i}"><span>${esc(p.title)}</span><i></i></button>`).join('')}</div>` : ''}`;
   mountProtos(hero);
+  if (n < 2) return;
+  heroGo(0);
+
+  // Avança sozinho quando a barra de progresso do slide termina (CSS controla o tempo e a pausa)
+  hero.addEventListener('animationend', e => { if (e.animationName === 'hero-fill') heroGo(heroIdx + 1); });
+  hero.addEventListener('click', e => {
+    const step = e.target.closest('[data-hero]'), go = e.target.closest('[data-hero-go]');
+    if (step) heroGo(heroIdx + Number(step.dataset.hero));
+    if (go) heroGo(Number(go.dataset.heroGo));
+  });
+  // Pausas: mouse/foco no banner, tour do protótipo rodando, toque no celular, aba escondida
+  hero.addEventListener('mouseenter', () => setHeroPause('hover', true));
+  hero.addEventListener('mouseleave', () => setHeroPause('hover', false));
+  hero.addEventListener('focusin', () => setHeroPause('focus', true));
+  hero.addEventListener('focusout', () => setHeroPause('focus', false));
+  hero.querySelectorAll('[data-proto]').forEach(h => {
+    h.addEventListener('tourstart', () => setHeroPause('tour', true));
+    h.addEventListener('tourend', () => setHeroPause('tour', false));
+  });
+  let touchTimer;
+  hero.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' || !e.target.closest('.hero-visual')) return;
+    setHeroPause('touch', true); clearTimeout(touchTimer); touchTimer = setTimeout(() => setHeroPause('touch', false), 15000);
+  });
+  document.addEventListener('visibilitychange', () => setHeroPause('hidden', document.hidden));
+  // Deslizar com o dedo no texto troca de série (dentro do celular, o gesto é do protótipo)
+  let x0 = null;
+  hero.addEventListener('touchstart', e => { x0 = e.target.closest('.hero-visual, .hero-dots') ? null : e.touches[0].clientX; }, { passive: true });
+  hero.addEventListener('touchend', e => {
+    if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 50) heroGo(heroIdx + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+}
+
+function heroGo(i) {
+  const hero = $('#hero'), slides = [...hero.querySelectorAll('.hero-slide')], dots = [...hero.querySelectorAll('.hero-dot')];
+  const n = slides.length; heroIdx = ((i % n) + n) % n;
+  $('.hero-track', hero).style.transform = `translateX(-${heroIdx * 100}%)`;
+  slides.forEach((s, k) => { s.toggleAttribute('inert', k !== heroIdx); s.setAttribute('aria-hidden', String(k !== heroIdx)); });
+  dots.forEach((d, k) => { d.classList.remove('active'); d.classList.toggle('done', k < heroIdx); d.setAttribute('aria-selected', String(k === heroIdx)); });
+  void hero.offsetWidth; // reinicia a animação da barra de progresso
+  dots[heroIdx].classList.add('active');
+}
+
+function setHeroPause(key, on) {
+  on ? heroPause.add(key) : heroPause.delete(key);
+  $('#hero').classList.toggle('paused', heroPause.size > 0);
 }
 
 // Protótipos interativos montados na página (ver prototype.js). Um por área (banner e modal).
@@ -126,9 +186,9 @@ function renderRows() {
   const rows = [];
   rows.push(row('row-projetos', 'Projetos', DATA.projects.map(projectCard)));
 
-  for (const p of DATA.projects.filter(p => p.episodes?.length)) {
-    rows.push(row(p.featured ? 'row-episodios' : `row-ep-${p.id}`, `${p.title}: feature por feature`,
-      p.episodes.map((ep, i) => episodeCard(p, ep, i))));
+  for (const p of DATA.projects.filter(p => p.features?.length)) {
+    rows.push(row(p.featured ? 'row-features' : `row-ep-${p.id}`, `${p.title}: feature por feature`,
+      p.features.map((ep, i) => featureCard(p, ep, i))));
   }
 
   if (DATA.comingSoon?.length) rows.push(row('row-embreve', 'Em breve', DATA.comingSoon.map(soonCard)));
@@ -168,12 +228,12 @@ function projectCard(p) {
   </button>`;
 }
 
-function episodeCard(p, ep, i) {
+function featureCard(p, ep, i) {
   return `<button class="card" style="--c:${esc(p.accent)}" data-open="${esc(p.id)}" data-ep="${i}">
     <div class="card-art"></div>
     <span class="card-num">${String(i + 1).padStart(2, '0')}</span>
     <div class="card-body">
-      <span class="card-kicker">${esc(p.title)} · EP ${i + 1}</span>
+      <span class="card-kicker">${esc(p.title)} · Feature ${i + 1}</span>
       <span class="card-title">${esc(ep.title)}</span>
       <span class="card-sub">${esc((ep.tags || []).join(' · '))}</span>
     </div>
@@ -185,7 +245,7 @@ function soonCard(s) {
     <div class="card-art"></div>
     <span class="ribbon">Em breve</span>
     <div class="card-body">
-      <span class="card-kicker">Próxima temporada</span>
+      <span class="card-kicker">Em breve no catálogo</span>
       <span class="card-title">${esc(s.title)}</span>
     </div>
   </div>`;
@@ -236,6 +296,7 @@ function showModal(html, accent) {
   $('#modal').hidden = false;
   document.body.style.overflow = 'hidden';
   $('.modal-close').focus();
+  setHeroPause('modal', true);
 }
 function closeModal() {
   if ($('#modal').hidden) return;
@@ -243,6 +304,7 @@ function closeModal() {
   unmountProtos($('#modal-body'));
   $('#modal-body').innerHTML = ''; // descarrega o iframe/protótipo
   document.body.style.overflow = '';
+  setHeroPause('modal', false);
   if (location.hash.startsWith('#projeto/')) history.replaceState(null, '', location.pathname);
   lastFocus?.focus();
 }
@@ -251,7 +313,7 @@ function openProject(id, epIndex) {
   const p = DATA.projects.find(x => x.id === id);
   if (!p) return;
   history.replaceState(null, '', `#projeto/${p.id}`);
-  const eps = p.episodes || [];
+  const eps = p.features || [];
   showModal(`
     <div class="modal-hero">
       <h3 id="modal-title">${esc(p.title)}</h3>
@@ -277,10 +339,10 @@ function openProject(id, epIndex) {
       <small>Funciona junto com</small>
       <button class="related-card" style="--c:${esc(r.accent)}" data-open="${esc(r.id)}"><b>${esc(r.title)}</b><span>${esc(r.tagline)}</span><em>Ver projeto ›</em></button>
       ${p.relation ? `<p>${esc(p.relation)}</p>` : ''}</div>`).join('')}
-    ${eps.length ? `<div class="episodes">
+    ${eps.length ? `<div class="features">
       <h4>Features</h4>
-      ${eps.map((ep, i) => `<div class="episode" id="ep-${i}">
-        <div class="episode-num">${i + 1}</div>
+      ${eps.map((ep, i) => `<div class="feature" id="ep-${i}">
+        <div class="feature-num">${i + 1}</div>
         <div><b>${esc(ep.title)}</b><p>${esc(ep.desc)}</p>${tagsHtml(ep.tags)}</div>
       </div>`).join('')}
     </div>` : ''}`, p.accent);
