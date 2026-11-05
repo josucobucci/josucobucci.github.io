@@ -238,3 +238,8 @@ button { font: inherit; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Modal do protótipo: celular maior */
+.demo-stage .phone { width: min(340px, 78vw); }
+.demo-stage .proto-wrap { gap: 20px; }
+.hero-visual .proto-wrap { gap: 22px; }

@@ -45,8 +45,10 @@ function renderTopbar() {
   ].filter(Boolean).join('');
 }
 
-function demoButton(p, label = 'Testar ao vivo') {
-  return p.demo
+const hasDemo = p => Boolean(p.prototype || p.demo);
+
+function demoButton(p, label = 'Explorar o app') {
+  return hasDemo(p)
     ? `<button class="btn btn-primary" data-demo="${esc(p.id)}">${ICONS.play} ${label}</button>`
     : `<span class="btn btn-primary" aria-disabled="true" title="A versão web interativa está sendo preparada">${ICONS.play} Demo em breve</span>`;
 }
@@ -60,7 +62,7 @@ function renderHero(p) {
       <h1 class="hero-title">${esc(p.title)}</h1>
       <div class="hero-meta">
         <span>${esc(p.year)}</span>
-        <span class="badge ${p.demo ? 'live' : ''}">${p.demo ? 'DEMO AO VIVO' : esc(p.status)}</span>
+        <span class="badge ${hasDemo(p) ? 'live' : ''}">${p.prototype ? 'PROTÓTIPO INTERATIVO' : p.demo ? 'DEMO AO VIVO' : esc(p.status)}</span>
         <span>${esc(p.category)}</span>
         <span>${p.episodes?.length || 0} features</span>
       </div>
@@ -72,10 +74,31 @@ function renderHero(p) {
       </div>
     </div>
     <div class="hero-visual">${phoneHtml(p, false)}</div>`;
+  mountProtos(hero);
 }
 
-// Moldura de celular: mostra a demo real (iframe) se existir; senão, uma prévia ilustrativa.
+// Protótipos interativos montados na página (ver prototype.js). Um por área (banner e modal).
+const protoInstances = new WeakMap();
+function mountProtos(scope) {
+  scope.querySelectorAll('[data-proto]').forEach(host => {
+    if (typeof ZipPrototype === 'undefined' || protoInstances.has(host)) return;
+    const inst = ZipPrototype.mount(host);
+    protoInstances.set(host, inst);
+    const btn = host.closest('.proto-wrap, .hero-visual')?.querySelector('[data-tour]');
+    host.addEventListener('tourstart', () => { if (btn) btn.textContent = '■ Parar tour'; });
+    host.addEventListener('tourend', () => { if (btn) btn.textContent = '▶ Tour automático'; });
+  });
+}
+function unmountProtos(scope) {
+  scope.querySelectorAll('[data-proto]').forEach(host => { protoInstances.get(host)?.destroy(); protoInstances.delete(host); });
+}
+
+// Moldura de celular: protótipo interativo, demo real (iframe) ou prévia ilustrativa, nessa ordem.
 function phoneHtml(p, live) {
+  if (p.prototype) {
+    return `<div class="proto-wrap"><div class="phone ${live ? 'straight' : ''}"><div class="phone-screen"><div class="notch"></div><div class="px-host" data-proto="${esc(p.id)}"></div></div></div>
+      <div class="proto-controls"><button class="primary" data-tour>▶ Tour automático</button></div></div>`;
+  }
   const screen = live && p.demo
     ? `<iframe src="${esc(p.demo)}" title="Demo de ${esc(p.title)}" loading="lazy" allow="geolocation"></iframe>`
     : mockScreen(p);
@@ -134,7 +157,7 @@ function row(id, title, cards) {
 function projectCard(p) {
   return `<button class="card" style="--c:${esc(p.accent)}" data-open="${esc(p.id)}">
     <div class="card-art"></div>
-    ${p.demo ? '<span class="ribbon">▶ Demo ao vivo</span>' : ''}
+    ${hasDemo(p) ? '<span class="ribbon">▶ Interativo</span>' : ''}
     <div class="card-body">
       <span class="card-kicker">${esc(p.category)}</span>
       <span class="card-title">${esc(p.title)}</span>
@@ -190,6 +213,12 @@ function setupModal() {
   document.addEventListener('click', e => {
     const open = e.target.closest('[data-open]');
     const demo = e.target.closest('[data-demo]');
+    const tour = e.target.closest('[data-tour]');
+    if (tour) {
+      const host = tour.closest('.proto-wrap, .hero-visual').querySelector('[data-proto]');
+      const inst = protoInstances.get(host);
+      return tour.textContent.includes('Parar') ? inst?.stop() : inst?.tour();
+    }
     if (demo) return openDemo(demo.dataset.demo);
     if (open) return openProject(open.dataset.open, open.dataset.ep);
     if (e.target.closest('[data-close]')) closeModal();
@@ -209,7 +238,8 @@ function showModal(html, accent) {
 function closeModal() {
   if ($('#modal').hidden) return;
   $('#modal').hidden = true;
-  $('#modal-body').innerHTML = ''; // descarrega o iframe da demo
+  unmountProtos($('#modal-body'));
+  $('#modal-body').innerHTML = ''; // descarrega o iframe/protótipo
   document.body.style.overflow = '';
   if (location.hash.startsWith('#projeto/')) history.replaceState(null, '', location.pathname);
   lastFocus?.focus();
@@ -258,12 +288,16 @@ function openProject(id, epIndex) {
 
 function openDemo(id) {
   const p = DATA.projects.find(x => x.id === id);
-  if (!p?.demo) return;
+  if (!p || !hasDemo(p)) return;
+  const note = p.prototype
+    ? 'Protótipo com dados fictícios: toque nos cards, nas abas e no chat, ou arraste para os lados para trocar de tela.'
+    : `${esc(p.demoNote || 'Versão web real do app, rodando no seu navegador.')} <a href="${esc(p.demo)}" target="_blank" rel="noopener" style="text-decoration:underline">Abrir em tela cheia ↗</a>`;
   showModal(`
     <div class="demo-stage">
-      <h3 id="modal-title" style="margin:0 0 20px">${esc(p.title)}: demo ao vivo</h3>
+      <h3 id="modal-title" style="margin:0 0 20px">${esc(p.title)}: ${p.prototype ? 'protótipo interativo' : 'demo ao vivo'}</h3>
       ${phoneHtml(p, true)}
-      <p class="demo-note">${esc(p.demoNote || 'Versão web real do app, rodando no seu navegador.')}
-        <a href="${esc(p.demo)}" target="_blank" rel="noopener" style="text-decoration:underline">Abrir em tela cheia ↗</a></p>
+      <p class="demo-note">${note}</p>
     </div>`, p.accent);
+  mountProtos($('#modal-body'));
+  if (p.prototype) setTimeout(() => protoInstances.get($('#modal-body [data-proto]'))?.tour(), 600);
 }
