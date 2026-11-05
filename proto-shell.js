@@ -14,7 +14,7 @@ const ProtoShell = (() => {
 
     host.innerHTML = `
       <div class="px t-${theme}" style="width:${W}px;height:${H}px">
-        <div class="px-status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="px-sysbar"><span>9:41</span><span>●●● ▮</span></div>
         <div class="px-pages">${render.map((_, i) => `<section class="px-page" data-page="${i}"></section>`).join('')}</div>
         ${layers.map(n => `<div class="px-overlay" data-layer="${n}"></div>`).join('')}
         <nav class="px-tabs">${tabs.map((t, i) => `<button data-tab="${i}"><b>${t.icon}</b><span>${t.label}</span></button>`).join('')}</nav>

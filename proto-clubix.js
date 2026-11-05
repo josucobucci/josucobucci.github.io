@@ -65,7 +65,7 @@ const ClubixPrototype = (() => {
 
     // Barra superior igual à do Clubix real: degradê grená + selo do balão
     const LOGO = '<svg viewBox="0 0 38 38"><rect width="38" height="38" rx="11" fill="#fff"/><g transform="translate(7.2 7.2) scale(1.0333)" fill="#7a1230"><path d="M12 3.2c-5.1 0-9.2 3.4-9.2 7.8 0 2.1.9 4 2.5 5.4L4.4 20.6l4.2-2.1c1.1.3 2.2.5 3.4.5 5.1 0 9.2-3.4 9.2-7.8S17.1 3.2 12 3.2Z"/><circle cx="8" cy="11" r="1.2" fill="#fff"/><circle cx="12" cy="11" r="1.2" fill="#fff"/><circle cx="16" cy="11" r="1.2" fill="#fff"/></g></svg>';
-    const appbar = () => `<div class="px-appbar"><span class="px-logo">${LOGO}</span><div class="px-apptitle"><b>Clubix</b><small>CENTRAL DE ATENDIMENTO</small></div><button class="px-moon" data-moon aria-label="Alternar tema">☾</button></div>`;
+    const appbar = () => `<div class="px-appbar"><span class="px-logo">${LOGO}</span><div class="px-apptitle"><b>Clubix</b><small>CENTRAL DE ATENDIMENTO</small></div><button class="px-moon" data-moon aria-label="Alternar tema"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button></div>`;
     const wrap = f => () => appbar() + `<div class="px-body">${f()}</div>`;
 
     const sortedQueue = () => [...S.queue].sort((a, b) => (b.assoc - a.assoc) || (b.espera - a.espera));

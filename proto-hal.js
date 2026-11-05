@@ -67,7 +67,7 @@ const HalPrototype = (() => {
 
     /* ---------- Páginas ---------- */
     const MASCOT = '<span class="hl-mascot-av"><img src="assets/hal/mascote.png" alt="Mascote do HAL"></span>';
-    const appbar = () => `<div class="px-appbar">${MASCOT}<div class="px-apptitle"><b>Central de Atendimento</b><small>ASSISTENTE VIRTUAL HAL</small></div><button class="px-moon" data-moon aria-label="Alternar tema">☾</button></div>`;
+    const appbar = () => `<div class="px-appbar">${MASCOT}<div class="px-apptitle"><b>Central de Atendimento</b><small>ASSISTENTE VIRTUAL HAL</small></div><button class="px-moon" data-moon aria-label="Alternar tema"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button></div>`;
     const wrap = f => () => appbar() + `<div class="px-body">${f()}</div>`;
     const clock = () => `10:${String(30 + Math.floor(S.msgs.length / 2)).padStart(2, '0')}`;
 

@@ -43,7 +43,7 @@ const ZipPrototype = (() => {
 
     host.innerHTML = `
       <div class="px" style="width:${W}px;height:${H}px">
-        <div class="px-status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="px-sysbar"><span>9:41</span><span>●●● ▮</span></div>
         <div class="px-pages"></div>
         <div class="px-overlay" data-layer="product"></div>
         <div class="px-overlay" data-layer="chat"></div>

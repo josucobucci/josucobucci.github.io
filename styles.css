@@ -48,9 +48,9 @@ button { font: inherit; cursor: pointer; }
 .hero { position: relative; overflow: hidden; }
 .hero-track { display: flex; transition: transform .8s cubic-bezier(.65, 0, .25, 1); }
 .hero-slide {
-  flex: none; width: 100%; position: relative; min-height: min(88vh, 760px);
+  flex: none; width: 100%; position: relative;
   display: grid; grid-template-columns: 1.1fr .9fr; align-items: center; gap: 24px;
-  padding: 110px var(--gutter) 110px;
+  padding: 84px var(--gutter) 88px;
 }
 .hero-slide::before {
   content: ""; position: absolute; inset: 0; z-index: -2;
@@ -242,7 +242,8 @@ button { font: inherit; cursor: pointer; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 860px) {
-  .hero-slide { grid-template-columns: 1fr; padding-top: 96px; }
+  .hero-slide { grid-template-columns: 1fr; padding-top: 92px; }
+  .hero-visual .phone { width: 200px; }
   .hero-arrow { display: none; }
   .hero-visual { order: -1; }
   .phone { width: 200px; }
@@ -261,7 +262,8 @@ button { font: inherit; cursor: pointer; }
 /* Modal do protótipo: celular maior */
 .demo-stage .phone { width: min(340px, 78vw); }
 .demo-stage .proto-wrap { gap: 20px; }
-.hero-visual .proto-wrap { gap: 22px; }
+.hero-visual .proto-wrap { gap: 14px; }
+.hero-visual .phone { width: clamp(180px, calc((100vh - 252px) * .4615), 280px); }
 
 .btn[aria-disabled="true"] { cursor: default; }
 .related { padding: 0 32px 24px; }
@@ -277,7 +279,7 @@ button { font: inherit; cursor: pointer; }
 
 /* Mascote no banner e nos cards */
 .hero-visual.has-art { display: flex; align-items: flex-end; justify-content: center; }
-.hero-art { position: relative; z-index: 2; width: min(300px, 25vw); height: auto; margin: 0 -96px -6px 0; pointer-events: none; filter: drop-shadow(0 22px 28px rgba(0,0,0,.5)); }
+.hero-art { position: relative; z-index: 2; width: clamp(190px, calc((100vh - 252px) * .5), 300px); height: auto; margin: 0 -96px -6px 0; pointer-events: none; filter: drop-shadow(0 22px 28px rgba(0,0,0,.5)); }
 .card-img { position: absolute; right: -4px; bottom: -6px; height: 112%; width: auto; max-width: 62%; object-fit: contain; object-position: bottom right; filter: drop-shadow(0 8px 14px rgba(0,0,0,.45)); pointer-events: none; }
 .card-logo { position: absolute; top: 12px; right: 12px; width: 40px; height: 40px; border-radius: 11px; box-shadow: 0 4px 12px rgba(0,0,0,.4); pointer-events: none; }
 @media (max-width: 860px) { .hero-art { display: none; } }

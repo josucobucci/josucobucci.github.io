@@ -25,12 +25,14 @@ async function init() {
     console.error(err);
     return;
   }
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   renderTopbar();
   renderHero([...DATA.projects].sort((x, y) => Boolean(y.featured) - Boolean(x.featured)));
   renderRows();
   renderFooter();
   setupModal();
   window.addEventListener('scroll', () => $('#topbar').classList.toggle('solid', scrollY > 40), { passive: true });
+  if (!location.hash) scrollTo(0, 0);
   // Abre direto um projeto se a URL tiver #projeto/<id> (link compartilhável)
   const m = location.hash.match(/^#projeto\/(.+)$/);
   if (m) openProject(m[1]);
