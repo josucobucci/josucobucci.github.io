@@ -112,7 +112,7 @@
       "year": 2026,
       "status": "Em desenvolvimento",
       "category": "Web · Tempo real",
-      "accent": "#2563EB",
+      "accent": "#A3274C",
       "prototype": true,
       "related": [
         "hal"
@@ -164,6 +164,38 @@
           "tags": [
             "Tempo real",
             "Notificações"
+          ]
+        },
+        {
+          "title": "Entrada na fila sem login",
+          "desc": "Qualquer pessoa entra na fila só com o nome. Quem é associado entra com a matrícula e tem prioridade no atendimento.",
+          "tags": [
+            "Fila",
+            "Prioridade"
+          ]
+        },
+        {
+          "title": "O atendente acompanha o HAL ao vivo",
+          "desc": "A aba \"Com a IA\" mostra as conversas do HAL em andamento. O atendente vê sem interferir e pode assumir quando quiser.",
+          "tags": [
+            "IA",
+            "Tempo real"
+          ]
+        },
+        {
+          "title": "Avisos e carrossel no portal",
+          "desc": "Editor de avisos e de um carrossel que aparecem na entrada do chat, para comunicados do clube.",
+          "tags": [
+            "Django",
+            "Editor"
+          ]
+        },
+        {
+          "title": "Tema claro e noturno",
+          "desc": "Interface responsiva para o cliente, com opção de tema noturno em todo o sistema.",
+          "tags": [
+            "CSS",
+            "Acessibilidade"
           ]
         },
         {
@@ -220,6 +252,30 @@
             "Testes automatizados"
           ]
         }
+      ],
+      "art": "assets/clubix/logo-selo.svg",
+      "gallery": [
+        {
+          "src": "assets/telas/atendente-02-conversa.png",
+          "title": "Conversa em atendimento"
+        },
+        {
+          "src": "assets/telas/atendente-03-com-a-ia.png",
+          "title": "Aba \"Com a IA\": acompanhando o HAL ao vivo"
+        },
+        {
+          "src": "assets/telas/atendente-07-discagem.png",
+          "title": "Discagem de ramais (VoIP SIP)"
+        },
+        {
+          "src": "assets/telas/admin-03-fluxo.png",
+          "title": "Editor de fluxo do chatbot"
+        },
+        {
+          "src": "assets/telas/cliente-03-carol.png",
+          "title": "Chat do associado no celular",
+          "kind": "mobile"
+        }
       ]
     },
     {
@@ -228,7 +284,7 @@
       "year": 2026,
       "status": "Em evolução",
       "category": "IA · Agente",
-      "accent": "#06B6D4",
+      "accent": "#F0B54A",
       "prototype": true,
       "related": [
         "clubix"
@@ -306,6 +362,15 @@
           ]
         },
         {
+          "title": "Painel de gestão do HAL",
+          "desc": "Visão geral, desempenho, perguntas, assuntos, custos, auditoria, respostas oficiais e configuração. Inclui mapa de calor de quando perguntam e teto diário de gasto.",
+          "tags": [
+            "Django",
+            "Métricas",
+            "Custo"
+          ]
+        },
+        {
           "title": "Avaliação e qualidade",
           "desc": "121 casos de avaliação contra o endpoint real, 193 testes sem rede, instância de staging e replay de perguntas reais antes de cada deploy.",
           "tags": [
@@ -323,6 +388,30 @@
             "Gunicorn",
             "systemd"
           ]
+        }
+      ],
+      "art": "assets/hal/mascote.png",
+      "gallery": [
+        {
+          "src": "assets/telas/cliente-03-carol.png",
+          "title": "O HAL conversando com o associado",
+          "kind": "mobile"
+        },
+        {
+          "src": "assets/telas/atendente-03-com-a-ia.png",
+          "title": "O atendente acompanha a conversa do HAL"
+        },
+        {
+          "src": "assets/telas/hal-painel-visao-geral.png",
+          "title": "Painel de IA: visão geral"
+        },
+        {
+          "src": "assets/telas/hal-painel-sem-resposta.png",
+          "title": "Painel de IA: perguntas sem resposta"
+        },
+        {
+          "src": "assets/telas/hal-painel-respostas-oficiais.png",
+          "title": "Painel de IA: respostas oficiais"
         }
       ]
     }

@@ -63,6 +63,11 @@ const ClubixPrototype = (() => {
     const ROLES = ['Atendente', 'Editor', 'Administrador'];
     let ctx;
 
+    // Barra superior igual à do Clubix real: degradê grená + selo do balão
+    const LOGO = '<svg viewBox="0 0 38 38"><rect width="38" height="38" rx="11" fill="#fff"/><g transform="translate(7.2 7.2) scale(1.0333)" fill="#7a1230"><path d="M12 3.2c-5.1 0-9.2 3.4-9.2 7.8 0 2.1.9 4 2.5 5.4L4.4 20.6l4.2-2.1c1.1.3 2.2.5 3.4.5 5.1 0 9.2-3.4 9.2-7.8S17.1 3.2 12 3.2Z"/><circle cx="8" cy="11" r="1.2" fill="#fff"/><circle cx="12" cy="11" r="1.2" fill="#fff"/><circle cx="16" cy="11" r="1.2" fill="#fff"/></g></svg>';
+    const appbar = () => `<div class="px-appbar"><span class="px-logo">${LOGO}</span><div class="px-apptitle"><b>Clubix</b><small>CENTRAL DE ATENDIMENTO</small></div><button class="px-moon" data-moon aria-label="Alternar tema">☾</button></div>`;
+    const wrap = f => () => appbar() + `<div class="px-body">${f()}</div>`;
+
     const sortedQueue = () => [...S.queue].sort((a, b) => (b.assoc - a.assoc) || (b.espera - a.espera));
 
     /* ---------- Páginas ---------- */
@@ -193,11 +198,12 @@ const ClubixPrototype = (() => {
       theme: 'clubix',
       tabs: [{ label: 'Fila', icon: '☰' }, { label: 'Conversas', icon: '✉' }, { label: 'Fluxos', icon: '⑂' }, { label: 'Ramais', icon: '☎' }, { label: 'Admin', icon: '⚙' }],
       layers: ['chat', 'sheet', 'call'],
-      render: [filaHtml, conversasHtml, fluxosHtml, ramaisHtml, adminHtml],
+      render: [filaHtml, conversasHtml, fluxosHtml, ramaisHtml, adminHtml].map(wrap),
       onLayerClose: name => { if (name === 'chat') { S.open = null; ctx.renderPage(1); } },
       onClick(b, c) {
         const d = b.dataset;
-        if ('auto' in d) distribute();
+        if ('moon' in d) c.root.classList.toggle('dark');
+        else if ('auto' in d) distribute();
         else if (d.take) take(+d.take);
         else if (d.chat) openChat(+d.chat);
         else if (d.close === 'chat') ctx.closeLayer('chat');

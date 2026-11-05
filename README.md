@@ -21,6 +21,8 @@ Tudo vem de [`data/projects.json`](data/projects.json):
 - `prototype`: `true` abre o protótipo de celular do projeto (o `id` precisa existir em `prototype.js`, `proto-clubix.js` ou `proto-hal.js`).
 - `demo`: URL de uma versão web real (iframe), alternativa ao protótipo. Sem `prototype` nem `demo`, o botão aparece como "Demo em breve".
 - `repo`: link do GitHub. Com `null`, a página mostra "Código privado".
+- `art`: imagem do projeto. PNG/WebP (como o mascote do HAL) aparece no banner e no card; SVG (como o selo do Clubix) aparece como logo no card.
+- `gallery[]`: telas reais do sistema (`src`, `title`, `kind: "mobile"` opcional), exibidas no modal com ampliação. Use só capturas com dados fictícios.
 - `related` e `relation`: ids de projetos que funcionam juntos e o texto que explica a relação.
 - `comingSoon[]`: projetos anunciados que ainda não têm conteúdo.
 

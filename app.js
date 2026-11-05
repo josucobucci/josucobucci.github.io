@@ -45,6 +45,7 @@ function renderTopbar() {
   ].filter(Boolean).join('');
 }
 
+const isRaster = src => /\.(png|webp|jpe?g)$/i.test(src || '');
 const hasDemo = p => Boolean(p.prototype || p.demo);
 
 function demoButton(p, label = 'Explorar o app') {
@@ -76,7 +77,7 @@ function heroSlide(p, i, n) {
         <button class="btn btn-ghost" data-open="${esc(p.id)}">${ICONS.info} Mais informações</button>
       </div>
     </div>
-    <div class="hero-visual">${phoneHtml(p, false)}</div>
+    <div class="hero-visual ${isRaster(p.art) ? 'has-art' : ''}">${isRaster(p.art) ? `<img class="hero-art" src="${esc(p.art)}" alt="" loading="lazy">` : ''}${phoneHtml(p, false)}</div>
   </article>`;
 }
 
@@ -219,6 +220,7 @@ function row(id, title, cards) {
 function projectCard(p) {
   return `<button class="card" style="--c:${esc(p.accent)}" data-open="${esc(p.id)}">
     <div class="card-art"></div>
+    ${p.art ? `<img class="${isRaster(p.art) ? 'card-img' : 'card-logo'}" src="${esc(p.art)}" alt="" loading="lazy">` : ''}
     ${hasDemo(p) ? '<span class="ribbon">▶ Interativo</span>' : ''}
     <div class="card-body">
       <span class="card-kicker">${esc(p.category)}</span>
@@ -276,6 +278,9 @@ function setupModal() {
     const open = e.target.closest('[data-open]');
     const demo = e.target.closest('[data-demo]');
     const tour = e.target.closest('[data-tour]');
+    const shot = e.target.closest('[data-shot]');
+    if (shot) return openShot(Number(shot.dataset.shot));
+    if (e.target.closest('.lightbox')) return closeShot();
     if (tour) {
       const host = tour.closest('.proto-wrap, .hero-visual').querySelector('[data-proto]');
       const inst = protoInstances.get(host);
@@ -285,7 +290,7 @@ function setupModal() {
     if (open) return openProject(open.dataset.open, open.dataset.ep);
     if (e.target.closest('[data-close]')) closeModal();
   });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('.lightbox')) closeShot(); else closeModal(); } });
 }
 
 let lastFocus;
@@ -309,9 +314,11 @@ function closeModal() {
   lastFocus?.focus();
 }
 
+let currentProject = null;
 function openProject(id, epIndex) {
   const p = DATA.projects.find(x => x.id === id);
   if (!p) return;
+  currentProject = p;
   history.replaceState(null, '', `#projeto/${p.id}`);
   const eps = p.features || [];
   showModal(`
@@ -335,6 +342,8 @@ function openProject(id, epIndex) {
         <div><span>Categoria: </span><b>${esc(p.category)}</b></div>
       </div>
     </div>
+    ${p.gallery?.length ? `<div class="gallery"><h4>Telas do sistema</h4><small>Capturas do sistema real rodando com dados fictícios. Toque para ampliar.</small>
+      <div class="gallery-track">${p.gallery.map((g, i) => `<button class="shot ${g.kind === 'mobile' ? 'mobile' : ''}" data-shot="${i}"><img src="${esc(g.src)}" alt="${esc(g.title)}" loading="lazy"><span>${esc(g.title)}</span></button>`).join('')}</div></div>` : ''}
     ${(p.related || []).map(rid => DATA.projects.find(x => x.id === rid)).filter(Boolean).map(r => `<div class="related">
       <small>Funciona junto com</small>
       <button class="related-card" style="--c:${esc(r.accent)}" data-open="${esc(r.id)}"><b>${esc(r.title)}</b><span>${esc(r.tagline)}</span><em>Ver projeto ›</em></button>
@@ -369,3 +378,14 @@ function openDemo(id) {
   mountProtos($('#modal-body'));
   if (p.prototype) setTimeout(() => protoInstances.get($('#modal-body [data-proto]'))?.tour(), 600);
 }
+
+/* ---------- Ampliar tela (lightbox) ---------- */
+function openShot(i) {
+  const g = currentProject?.gallery?.[i]; if (!g) return;
+  closeShot();
+  const box = document.createElement('div');
+  box.className = 'lightbox'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', g.title);
+  box.innerHTML = `<figure><img src="${esc(g.src)}" alt="${esc(g.title)}"><figcaption>${esc(g.title)}</figcaption></figure>`;
+  document.body.appendChild(box);
+}
+function closeShot() { document.querySelector('.lightbox')?.remove(); }

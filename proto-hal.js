@@ -26,7 +26,7 @@ const HalPrototype = (() => {
     const esc = ProtoShell.esc;
     const S = {
       logged: true, thinking: false, last: null, asked: 0,
-      msgs: [{ w: 'bot', t: 'Olá! Eu sou o HAL, assistente virtual do Clube dos Funcionários. Pergunte sobre atividades, avisos, estatuto ou como usar o portal.' }],
+      msgs: [{ w: 'bot', time: '10:29', t: 'Olá! Eu sou o HAL, assistente virtual do Clube dos Funcionários. Pergunte sobre atividades, avisos, estatuto ou como usar o portal.' }],
       gaps: [
         { id: 1, q: 'Posso levar convidado na piscina?', n: 14, done: false },
         { id: 2, q: 'Qual o prazo para trancar a matrícula?', n: 9, done: false },
@@ -56,26 +56,36 @@ const HalPrototype = (() => {
 
     function ask(text) {
       text = text.trim(); if (!text || S.thinking) return;
-      S.msgs.push({ w: 'me', t: text }); S.thinking = true; S.asked++; paintChat();
+      S.msgs.push({ w: 'me', t: text, time: clock() }); S.thinking = true; S.asked++; paintChat();
       const a = answer(text);
       ctx.later(() => {
-        S.thinking = false; S.last = a; S.msgs.push({ w: 'bot', ...a });
+        S.thinking = false; S.last = a; S.msgs.push({ w: 'bot', time: clock(), ...a });
         if (a.gapQ && !S.gaps.some(g => g.q === a.gapQ)) { S.gaps.unshift({ id: Date.now(), q: a.gapQ, n: 1, done: false }); ctx.renderPage(2); }
         paintChat(); ctx.renderPage(1);
       }, 900 + (a.blocked ? 0 : 500));
     }
 
     /* ---------- Páginas ---------- */
-    const chatHtml = () => `<div class="hl-chat">
-      <header class="hl-head"><div class="hl-logo"><i></i></div><div class="grow"><b>HAL</b><small>assistente do Clube</small></div>
-        <button class="hl-login ${S.logged ? 'on' : ''}" data-login>${S.logged ? '👤 Logado' : '👤 Visitante'}</button></header>
-      <div class="hl-msgs" data-msgs></div>
-      <div class="hl-suggest">${SUGGEST.map((s, i) => `<button data-s="${i}">${esc(s)}</button>`).join('')}</div>
-      <form class="px-compose" data-compose><input data-keep="ask" autocomplete="off" placeholder="Pergunte ao HAL…"><button>➤</button></form></div>`;
+    const MASCOT = '<span class="hl-mascot-av"><img src="assets/hal/mascote.png" alt="Mascote do HAL"></span>';
+    const appbar = () => `<div class="px-appbar">${MASCOT}<div class="px-apptitle"><b>Central de Atendimento</b><small>ASSISTENTE VIRTUAL HAL</small></div><button class="px-moon" data-moon aria-label="Alternar tema">☾</button></div>`;
+    const wrap = f => () => appbar() + `<div class="px-body">${f()}</div>`;
+    const clock = () => `10:${String(30 + Math.floor(S.msgs.length / 2)).padStart(2, '0')}`;
+
+    const chatHtml = () => `<div class="hl-chat">${appbar()}
+      <div class="hl-card">
+        <div class="hl-card-top"><span class="hl-pill"><i></i>disponível</span>
+          <button class="hl-login ${S.logged ? 'on' : ''}" data-login>${S.logged ? '👤 Associado logado' : '👤 Visitante'}</button></div>
+        <div class="hl-msgs" data-msgs></div>
+        <div class="hl-suggest">${SUGGEST.map((q, i) => `<button data-s="${i}">${esc(q)}</button>`).join('')}</div>
+        <form class="px-compose" data-compose><button type="button" class="hl-attach" aria-label="Anexar">📎</button><input data-keep="ask" autocomplete="off" placeholder="Escreva uma mensagem..."><button>Enviar</button></form>
+        <div class="hl-actions"><button data-human>Falar com humano</button><button data-end>Encerrar atendimento</button></div>
+      </div></div>`;
 
     function paintChat() {
       const box = ctx.q('[data-msgs]'); if (!box) return;
-      box.innerHTML = S.msgs.map(m => m.w === 'me' ? `<div class="px-msg me">${esc(m.t)}</div>` : `<div class="hl-bot"><div class="px-msg them">${esc(m.t)}</div>
+      box.innerHTML = S.msgs.map(m => m.w === 'me'
+        ? `<div class="px-msg me"><small>Você · ${m.time}</small>${esc(m.t)}</div>`
+        : `<div class="hl-bot"><div class="px-msg them"><small>HAL · ${m.time}</small>${esc(m.t)}</div>
         ${m.model !== undefined ? `<div class="hl-meta"><span>${esc(m.tag)}</span>${m.model ? `<span>✦ ${m.model}</span><span>⏱ ${secs(m.ms)}</span><span>${money(m.cost)}</span>` : '<span>sem chamada ao modelo · US$ 0</span>'}</div>` : ''}
         ${m.handoff ? '<button class="hl-handoff" data-handoff>💬 Falar com atendente (Clubix)</button>' : ''}</div>`).join('')
         + (S.thinking ? '<div class="px-msg them typing"><i></i><i></i><i></i></div>' : '');
@@ -99,11 +109,29 @@ const HalPrototype = (() => {
       return l.blocked ? 'não necessário' : 'Sem vazamento';
     }
 
-    const painelHtml = () => `<header class="px-head"><div><small>Observabilidade</small><h1>Painel</h1></div></header>
-      <div class="hl-kpis"><div><small>Latência p50</small><b>2,1 s</b></div><div><small>Latência p95</small><b>4,4 s</b></div><div><small>Perguntas hoje</small><b>${126 + S.asked}</b></div><div><small>Recusas</small><b>3%</b></div></div>
-      <div class="cx-card"><b>Assuntos (classificados por LLM)</b>${[['Atividades', 46], ['Estatuto', 24], ['Avisos', 17], ['Guias do portal', 13]].map(([n, v]) => `<div class="hl-bar"><span>${n}</span><div><i style="width:${v * 2}%"></i></div><em>${v}%</em></div>`).join('')}</div>
-      <div class="cx-card"><b>Perguntas sem resposta</b><small>Viram "respostas oficiais" injetadas no prompt, com cache próprio.</small>
+    const DAYS = [['sex', 32, 2], ['sáb', 4, 0], ['dom', 5, 0], ['seg', 42, 4], ['ter', 26, 1], ['qua', 27, 2], ['hoje', 19, 1]];
+    const painelHtml = () => `<header class="px-head"><div><small>Relatórios e gestão do HAL</small><h1>Inteligência Artificial</h1></div></header>
+      <div class="hl-pills"><span>● HAL online</span><span>● Proteção ativa</span></div>
+      <div class="hl-kpis">
+        <div class="k main"><small>Perguntas</small><b>${333 + S.asked}</b><em>47 usuários únicos</em></div>
+        <div class="k"><small>Respondidas</small><b>${299 + S.asked}</b><div class="hl-meter"><i style="width:89.8%"></i></div><em>89,8% do total</em></div>
+        <div class="k"><small>Sem resposta</small><b>9,6%</b><em>32 recusadas pelo HAL</em></div>
+        <div class="k"><small>Falhas de sistema</small><b>0,6%</b><em>2 falhas no período</em></div>
+        <div class="k"><small>Tempo de resposta</small><b>1,6 s</b><em>mediana · p95 4,3 s</em></div>
+        <div class="k"><small>Custo estimado</small><b>US$ 0,53</b><em>US$ 0,0016 por pergunta</em></div>
+      </div>
+      <div class="cx-card"><b>Perguntas por dia</b><small>Respondidas e sem resposta, dia a dia.</small>
+        <div class="hl-days">${DAYS.map(([d, n, g]) => `<div><em>${n}</em><i class="sem" style="height:${g * 2.4}px"></i><i style="height:${(n - g) * 2.4}px"></i><small>${d}</small></div>`).join('')}</div></div>
+      <div class="cx-card"><b>Assuntos (classificados por IA)</b>${[['Atividades', 46], ['Estatuto', 24], ['Avisos', 17], ['Guias do portal', 13]].map(([n, v]) => `<div class="hl-bar"><span>${n}</span><div><i style="width:${v * 2}%"></i></div><em>${v}%</em></div>`).join('')}</div>
+      <div class="cx-card"><b>Perguntas sem resposta</b><small>Viram "respostas oficiais", usadas pelo HAL em segundos.</small>
         ${S.gaps.map(g => `<div class="hl-gap ${g.done ? 'done' : ''}"><div><b>${esc(g.q)}</b><small>${g.n}× esta semana</small></div>${g.done ? '<em>✓ Oficial</em>' : `<button data-gap="${g.id}">Criar resposta</button>`}</div>`).join('')}</div>
+      <div class="cx-card"><b>Estado do HAL agora</b><div class="hl-state">
+        <div><small>Modelo</small><b>claude-haiku-5-5</b><code>effort: low</code></div>
+        <div><small>Capacidade</small><b>10 perguntas simultâneas</b></div>
+        <div><small>Prompt</small><b>Montado</b><code>ok</code></div>
+        <div><small>Respostas oficiais</small><b>${3 + S.gaps.filter(g => g.done).length} ativas</b></div>
+        <div><small>Documentos</small><b>Estatuto · Diretoria · Missão</b></div>
+        <div><small>Teto diário</small><b>US$ 5,00</b><code>gasto hoje: US$ 0,37</code></div></div></div>
       <p class="cx-note">Dados ilustrativos. CPF, e-mail e telefone são mascarados e o usuário vai em hash.</p>`;
 
     const segHtml = () => `<header class="px-head"><div><small>Segurança</small><h1>Testes de ataque</h1></div></header>
@@ -117,10 +145,13 @@ const HalPrototype = (() => {
       theme: 'hal',
       tabs: [{ label: 'HAL', icon: '✦' }, { label: 'Rota', icon: '⇄' }, { label: 'Painel', icon: '▥' }, { label: 'Segurança', icon: '⛨' }],
       layers: [],
-      render: [chatHtml, rotaHtml, painelHtml, segHtml],
+      render: [chatHtml, wrap(rotaHtml), wrap(painelHtml), wrap(segHtml)],
       onClick(b) {
         const d = b.dataset;
-        if (d.s != null) ask(SUGGEST[+d.s]);
+        if ('moon' in d) ctx.root.classList.toggle('dark');
+        else if (d.s != null) ask(SUGGEST[+d.s]);
+        else if ('human' in d) { S.msgs.push({ w: 'bot', time: clock(), t: 'Tudo bem! Estou transferindo você para um atendente do Clubix, com prioridade se você for associado.' }); paintChat(); ctx.toast('Entrando na fila do Clubix'); }
+        else if ('end' in d) ctx.toast('Atendimento encerrado (é só uma demo)');
         else if ('login' in d) { S.logged = !S.logged; ctx.renderPage(0); paintChat(); ctx.toast(S.logged ? 'Simulando associado logado' : 'Simulando visitante'); }
         else if ('handoff' in d) { b.disabled = true; b.textContent = '✓ Transferido para a fila do Clubix (prioridade alta)'; ctx.toast('Atendente humano avisado'); }
         else if (d.gap) { const g = S.gaps.find(x => x.id === +d.gap); g.done = true; ctx.renderPage(2); ctx.toast('Resposta oficial ativa no prompt ✓'); }
