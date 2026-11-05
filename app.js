@@ -1,10 +1,12 @@
-// Portfólio estilo catálogo: tudo é gerado a partir de data/projects.json.
-// Para adicionar um projeto novo, basta incluir uma entrada em "projects".
+// Portfólio estilo catálogo: tudo é gerado a partir de data/projects.json (e das versões .en/.es).
+// Para adicionar um projeto novo, basta incluir uma entrada em "projects" nos três arquivos.
+// Textos da interface: t('chave') em i18n.js.
 
 const ICONS = {
   github: '<svg viewBox="0 0 24 24"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.2-3.1-.1-.4-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.2 1.9 1.2 3.1 0 4.6-2.8 5.6-5.5 6 .4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5z"/></svg>',
   linkedin: '<svg viewBox="0 0 24 24"><path d="M20.4 20.5h-3.6v-5.6c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9v5.7H9.3V9h3.4v1.6c.5-.9 1.6-1.8 3.4-1.8 3.6 0 4.3 2.4 4.3 5.5v6.2zM5.3 7.4a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2zM7.1 20.5H3.5V9h3.6v11.5zM22.2 0H1.8C.8 0 0 .8 0 1.7v20.6c0 .9.8 1.7 1.8 1.7h20.4c1 0 1.8-.8 1.8-1.7V1.7C24 .8 23.2 0 22.2 0z"/></svg>',
   play: '<svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8z"/></svg>',
+  translate: '<svg viewBox="0 0 24 24"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>',
   info: '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>',
 };
 
@@ -17,11 +19,11 @@ let DATA;
 init();
 
 async function init() {
+  applyStaticTexts();
   try {
-    const res = await fetch('data/projects.json', { cache: 'no-cache' });
-    DATA = await res.json();
+    DATA = await loadData(SITE_LANG);
   } catch (err) {
-    $('#hero').innerHTML = '<p style="padding:120px 24px">Não foi possível carregar os projetos. Abra via servidor local (veja o README).</p>';
+    $('#hero').innerHTML = `<p style="padding:120px 24px">${esc(t('loadError'))}</p>`;
     console.error(err);
     return;
   }
@@ -38,22 +40,56 @@ async function init() {
   if (m) openProject(m[1]);
 }
 
+// Conteúdo dos projetos no idioma escolhido; se a tradução faltar, usa o português
+async function loadData(lang) {
+  const get = async file => { const r = await fetch(file, { cache: 'no-cache' }); if (!r.ok) throw new Error(file + ' ' + r.status); return r.json(); };
+  if (lang === 'pt') return get('data/projects.json');
+  try { return await get(`data/projects.${lang}.json`); } catch (e) { console.warn(e); return get('data/projects.json'); }
+}
+
+// Textos fixos do index.html (menu, título da aba, botão de fechar)
+function applyStaticTexts() {
+  document.title = t('title');
+  $('meta[name="description"]')?.setAttribute('content', t('metaDesc'));
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => el.setAttribute('aria-label', t(el.dataset.i18nAria)));
+}
+
+function langMenuHtml() {
+  return `<div class="lang">
+    <button class="icon-link lang-btn" aria-haspopup="true" aria-expanded="false" aria-label="${esc(t('language'))}" title="${esc(t('language'))}">${ICONS.translate}<span>${SITE_LANG.toUpperCase()}</span></button>
+    <div class="lang-menu" role="menu" hidden>${Object.entries(LANGS).map(([k, name]) =>
+      `<a role="menuitemradio" aria-checked="${k === SITE_LANG}" href="${langHref(k)}" data-lang="${k}" lang="${HTML_LANG[k]}">${name}${k === SITE_LANG ? ' <i>✓</i>' : ''}</a>`).join('')}</div>
+  </div>`;
+}
+function setupLangMenu() {
+  const box = $('.lang'); if (!box) return;
+  const btn = $('.lang-btn', box), menu = $('.lang-menu', box);
+  const toggle = open => { menu.hidden = !open; btn.setAttribute('aria-expanded', String(open)); };
+  btn.addEventListener('click', e => { e.stopPropagation(); toggle(menu.hidden); });
+  menu.addEventListener('click', e => { const a = e.target.closest('[data-lang]'); if (a) a.href = langHref(a.dataset.lang); });
+  document.addEventListener('click', e => { if (!box.contains(e.target)) toggle(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') toggle(false); });
+}
+
 function renderTopbar() {
   const o = DATA.owner;
   $('#brand').innerHTML = `${esc(o.name.toUpperCase())}<span>.</span>`;
   $('#topbar-links').innerHTML = [
+    langMenuHtml(),
     o.github && `<a class="icon-link" href="${esc(o.github)}" target="_blank" rel="noopener" aria-label="GitHub">${ICONS.github}</a>`,
     o.linkedin && `<a class="icon-link" href="${esc(o.linkedin)}" target="_blank" rel="noopener" aria-label="LinkedIn">${ICONS.linkedin}</a>`,
   ].filter(Boolean).join('');
+  setupLangMenu();
 }
 
 const isRaster = src => /\.(png|webp|jpe?g)$/i.test(src || '');
 const hasDemo = p => Boolean(p.prototype || p.demo);
 
-function demoButton(p, label = 'Explorar o app') {
+function demoButton(p, label = t('explore')) {
   return hasDemo(p)
-    ? `<button class="btn btn-primary" data-demo="${esc(p.id)}">${ICONS.play} ${label}</button>`
-    : `<span class="btn btn-primary" aria-disabled="true" title="A versão web interativa está sendo preparada">${ICONS.play} Demo em breve</span>`;
+    ? `<button class="btn btn-primary" data-demo="${esc(p.id)}">${ICONS.play} ${esc(label)}</button>`
+    : `<span class="btn btn-primary" aria-disabled="true" title="${esc(t('demoSoonTitle'))}">${ICONS.play} ${esc(t('demoSoon'))}</span>`;
 }
 
 // Banner: carrossel automático com uma série (projeto) por slide.
@@ -62,21 +98,21 @@ let heroIdx = 0;
 const heroPause = new Set();
 
 function heroSlide(p, i, n) {
-  return `<article class="hero-slide" style="--hero-accent:${esc(p.accent)}" aria-roledescription="slide" aria-label="${i + 1} de ${n}: ${esc(p.title)}">
+  return `<article class="hero-slide" style="--hero-accent:${esc(p.accent)}" aria-roledescription="slide" aria-label="${esc(t('slideLabel', { i: i + 1, n, title: p.title }))}">
     <div>
-      <div class="hero-kicker"><b>●</b> Série em destaque</div>
+      <div class="hero-kicker"><b>●</b> ${esc(t('featuredSeries'))}</div>
       <h1 class="hero-title">${esc(p.title)}</h1>
       <div class="hero-meta">
         <span>${esc(p.year)}</span>
-        <span class="badge ${hasDemo(p) ? 'live' : ''}">${p.prototype ? 'PROTÓTIPO INTERATIVO' : p.demo ? 'DEMO AO VIVO' : esc(p.status)}</span>
+        <span class="badge ${hasDemo(p) ? 'live' : ''}">${p.prototype ? t('badgeProto') : p.demo ? t('badgeLive') : esc(p.status)}</span>
         <span>${esc(p.category)}</span>
-        <span>${p.features?.length || 0} features</span>
+        <span>${esc(t('featuresCount', { n: p.features?.length || 0 }))}</span>
       </div>
       <p class="hero-tagline">${esc(p.tagline)}</p>
       <p class="hero-desc">${esc(p.description)}</p>
       <div class="actions">
         ${demoButton(p)}
-        <button class="btn btn-ghost" data-open="${esc(p.id)}">${ICONS.info} Mais informações</button>
+        <button class="btn btn-ghost" data-open="${esc(p.id)}">${ICONS.info} ${esc(t('moreInfo'))}</button>
       </div>
     </div>
     <div class="hero-visual ${isRaster(p.art) ? 'has-art' : ''}">${isRaster(p.art) ? `<img class="hero-art" src="${esc(p.art)}" alt="" loading="lazy">` : ''}${phoneHtml(p, false)}</div>
@@ -87,9 +123,9 @@ function renderHero(list) {
   const hero = $('#hero'), n = list.length;
   hero.innerHTML = `
     <div class="hero-track">${list.map((p, i) => heroSlide(p, i, n)).join('')}</div>
-    ${n > 1 ? `<button class="hero-arrow left" aria-label="Série anterior" data-hero="-1">‹</button>
-    <button class="hero-arrow right" aria-label="Próxima série" data-hero="1">›</button>
-    <div class="hero-dots" role="tablist" aria-label="Séries em destaque">${list.map((p, i) => `<button class="hero-dot" role="tab" data-hero-go="${i}"><span>${esc(p.title)}</span><i></i></button>`).join('')}</div>` : ''}`;
+    ${n > 1 ? `<button class="hero-arrow left" aria-label="${esc(t('prevSeries'))}" data-hero="-1">‹</button>
+    <button class="hero-arrow right" aria-label="${esc(t('nextSeries'))}" data-hero="1">›</button>
+    <div class="hero-dots" role="tablist" aria-label="${esc(t('seriesNav'))}">${list.map((p, i) => `<button class="hero-dot" role="tab" data-hero-go="${i}"><span>${esc(p.title)}</span><i></i></button>`).join('')}</div>` : ''}`;
   mountProtos(hero);
   if (n < 2) return;
   heroGo(0);
@@ -150,8 +186,8 @@ function mountProtos(scope) {
     const inst = proto.mount(host);
     protoInstances.set(host, inst);
     const btn = host.closest('.proto-wrap, .hero-visual')?.querySelector('[data-tour]');
-    host.addEventListener('tourstart', () => { if (btn) btn.textContent = '■ Parar tour'; });
-    host.addEventListener('tourend', () => { if (btn) btn.textContent = '▶ Tour automático'; });
+    host.addEventListener('tourstart', () => { if (btn) { btn.textContent = t('stopTour'); btn.dataset.running = '1'; } });
+    host.addEventListener('tourend', () => { if (btn) { btn.textContent = t('tour'); delete btn.dataset.running; } });
   });
 }
 function unmountProtos(scope) {
@@ -162,10 +198,10 @@ function unmountProtos(scope) {
 function phoneHtml(p, live) {
   if (p.prototype) {
     return `<div class="proto-wrap"><div class="phone ${live ? 'straight' : ''}"><div class="phone-screen"><div class="notch"></div><div class="px-host" data-proto="${esc(p.id)}"></div></div></div>
-      <div class="proto-controls"><button class="primary" data-tour>▶ Tour automático</button></div></div>`;
+      <div class="proto-controls"><button class="primary" data-tour>${esc(t('tour'))}</button></div></div>`;
   }
   const screen = live && p.demo
-    ? `<iframe src="${esc(p.demo)}" title="Demo de ${esc(p.title)}" loading="lazy" allow="geolocation"></iframe>`
+    ? `<iframe src="${esc(p.demo)}" title="${esc(t('demoOf', { title: p.title }))}" loading="lazy" allow="geolocation"></iframe>`
     : mockScreen(p);
   return `<div class="phone ${live ? 'straight' : ''}"><div class="phone-screen"><div class="notch"></div>${screen}</div></div>`;
 }
@@ -187,18 +223,18 @@ function mockScreen(p) {
 
 function renderRows() {
   const rows = [];
-  rows.push(row('row-projetos', 'Projetos', DATA.projects.map(projectCard)));
+  rows.push(row('row-projetos', t('rowProjects'), DATA.projects.map(projectCard)));
 
   for (const p of DATA.projects.filter(p => p.features?.length)) {
-    rows.push(row(p.featured ? 'row-features' : `row-ep-${p.id}`, `${p.title}: feature por feature`,
+    rows.push(row(p.featured ? 'row-features' : `row-ep-${p.id}`, t('rowFeatures', { title: p.title }),
       p.features.map((ep, i) => featureCard(p, ep, i))));
   }
 
-  if (DATA.comingSoon?.length) rows.push(row('row-embreve', 'Em breve', DATA.comingSoon.map(soonCard)));
+  if (DATA.comingSoon?.length) rows.push(row('row-embreve', t('rowSoon'), DATA.comingSoon.map(soonCard)));
 
   // Uma fileira por tecnologia: ajuda recrutadores que procuram uma stack específica
   const stack = [...new Set(DATA.projects.flatMap(p => p.tags))];
-  rows.push(row('row-stack', 'Por tecnologia', stack.map(t => stackCard(t))));
+  rows.push(row('row-stack', t('rowStack'), stack.map(t => stackCard(t))));
 
   $('#rows').innerHTML = rows.join('');
   document.querySelectorAll('.row-track-wrap').forEach(wrap => {
@@ -212,9 +248,9 @@ function row(id, title, cards) {
   return `<section class="row" id="${id}">
     <h2>${esc(title)}</h2>
     <div class="row-track-wrap">
-      <button class="row-arrow left" aria-label="Voltar">‹</button>
+      <button class="row-arrow left" aria-label="${esc(t('back'))}">‹</button>
       <div class="row-track">${cards.join('')}</div>
-      <button class="row-arrow right" aria-label="Avançar">›</button>
+      <button class="row-arrow right" aria-label="${esc(t('next'))}">›</button>
     </div>
   </section>`;
 }
@@ -223,7 +259,7 @@ function projectCard(p) {
   return `<button class="card" style="--c:${esc(p.accent)}" data-open="${esc(p.id)}">
     <div class="card-art"></div>
     ${p.art ? `<img class="${isRaster(p.art) ? 'card-img' : 'card-logo'}" src="${esc(p.art)}" alt="" loading="lazy">` : ''}
-    ${hasDemo(p) ? '<span class="ribbon">▶ Interativo</span>' : ''}
+    ${hasDemo(p) ? `<span class="ribbon">${esc(t('ribbonInteractive'))}</span>` : ''}
     <div class="card-body">
       <span class="card-kicker">${esc(p.category)}</span>
       <span class="card-title">${esc(p.title)}</span>
@@ -237,7 +273,7 @@ function featureCard(p, ep, i) {
     <div class="card-art"></div>
     <span class="card-num">${String(i + 1).padStart(2, '0')}</span>
     <div class="card-body">
-      <span class="card-kicker">${esc(p.title)} · Feature ${i + 1}</span>
+      <span class="card-kicker">${esc(p.title)} · ${esc(t('featureN', { n: i + 1 }))}</span>
       <span class="card-title">${esc(ep.title)}</span>
       <span class="card-sub">${esc((ep.tags || []).join(' · '))}</span>
     </div>
@@ -247,9 +283,9 @@ function featureCard(p, ep, i) {
 function soonCard(s) {
   return `<div class="card soon" style="--c:${esc(s.accent || '#52525b')}">
     <div class="card-art"></div>
-    <span class="ribbon">Em breve</span>
+    <span class="ribbon">${esc(t('soonRibbon'))}</span>
     <div class="card-body">
-      <span class="card-kicker">Em breve no catálogo</span>
+      <span class="card-kicker">${esc(t('soonKicker'))}</span>
       <span class="card-title">${esc(s.title)}</span>
     </div>
   </div>`;
@@ -260,7 +296,7 @@ function stackCard(tag) {
   return `<button class="card" style="--c:${esc(projs[0].accent)};width:clamp(170px,16vw,210px)" data-open="${esc(projs[0].id)}">
     <div class="card-art" style="filter:saturate(.5)"></div>
     <div class="card-body">
-      <span class="card-kicker">${projs.length} projeto${projs.length > 1 ? 's' : ''}</span>
+      <span class="card-kicker">${esc(projs.length > 1 ? t('projMany', { n: projs.length }) : t('projOne'))}</span>
       <span class="card-title" style="font-size:18px">${esc(tag)}</span>
     </div>
   </button>`;
@@ -271,7 +307,7 @@ function renderFooter() {
   $('#footer').innerHTML = `
     <p><b style="color:#e4e4e7">${esc(o.name)}</b>, ${esc(o.role)}</p>
     <p>${esc(o.bio)}</p>
-    <p>Feito com HTML, CSS e JavaScript puro · Hospedado no GitHub Pages</p>`;
+    <p>${esc(t('footerMade'))}</p>`;
 }
 
 /* ---------- Modal ---------- */
@@ -286,7 +322,7 @@ function setupModal() {
     if (tour) {
       const host = tour.closest('.proto-wrap, .hero-visual').querySelector('[data-proto]');
       const inst = protoInstances.get(host);
-      return tour.textContent.includes('Parar') ? inst?.stop() : inst?.tour();
+      return tour.dataset.running ? inst?.stop() : inst?.tour();
     }
     if (demo) return openDemo(demo.dataset.demo);
     if (open) return openProject(open.dataset.open, open.dataset.ep);
@@ -328,30 +364,30 @@ function openProject(id, epIndex) {
       <h3 id="modal-title">${esc(p.title)}</h3>
       <div class="actions">
         ${demoButton(p)}
-        ${p.repo ? `<a class="btn btn-ghost" href="${esc(p.repo)}" target="_blank" rel="noopener">${ICONS.github} Código no GitHub</a>` : `<span class="btn btn-ghost" aria-disabled="true" title="O código deste projeto é privado">🔒 Código privado</span>`}
+        ${p.repo ? `<a class="btn btn-ghost" href="${esc(p.repo)}" target="_blank" rel="noopener">${ICONS.github} ${esc(t('codeGithub'))}</a>` : `<span class="btn btn-ghost" aria-disabled="true" title="${esc(t('codePrivateTitle'))}">${esc(t('codePrivate'))}</span>`}
       </div>
     </div>
     <div class="modal-content">
       <div>
         <div class="hero-meta" style="margin-bottom:14px">
-          <span>${esc(p.year)}</span><span class="badge">${esc(p.status)}</span><span>${eps.length} features</span>
+          <span>${esc(p.year)}</span><span class="badge">${esc(p.status)}</span><span>${esc(t('featuresCount', { n: eps.length }))}</span>
         </div>
         <p><b style="color:#fff">${esc(p.tagline)}</b></p>
         <p>${esc(p.description)}</p>
       </div>
       <div class="modal-side">
-        <div><span>Stack: </span><b>${esc(p.tags.join(', '))}</b></div>
-        <div><span>Categoria: </span><b>${esc(p.category)}</b></div>
+        <div><span>${esc(t('stack'))}: </span><b>${esc(p.tags.join(', '))}</b></div>
+        <div><span>${esc(t('category'))}: </span><b>${esc(p.category)}</b></div>
       </div>
     </div>
-    ${p.gallery?.length ? `<div class="gallery"><h4>Telas do sistema</h4><small>Capturas do sistema real rodando com dados fictícios. Toque para ampliar.</small>
+    ${p.gallery?.length ? `<div class="gallery"><h4>${esc(t('gallery'))}</h4><small>${esc(t('galleryNote'))}</small>
       <div class="gallery-track">${p.gallery.map((g, i) => `<button class="shot ${g.kind === 'mobile' ? 'mobile' : ''}" data-shot="${i}"><img src="${esc(g.src)}" alt="${esc(g.title)}" loading="lazy"><span>${esc(g.title)}</span></button>`).join('')}</div></div>` : ''}
     ${(p.related || []).map(rid => DATA.projects.find(x => x.id === rid)).filter(Boolean).map(r => `<div class="related">
-      <small>Funciona junto com</small>
-      <button class="related-card" style="--c:${esc(r.accent)}" data-open="${esc(r.id)}"><b>${esc(r.title)}</b><span>${esc(r.tagline)}</span><em>Ver projeto ›</em></button>
+      <small>${esc(t('worksWith'))}</small>
+      <button class="related-card" style="--c:${esc(r.accent)}" data-open="${esc(r.id)}"><b>${esc(r.title)}</b><span>${esc(r.tagline)}</span><em>${esc(t('seeProject'))}</em></button>
       ${p.relation ? `<p>${esc(p.relation)}</p>` : ''}</div>`).join('')}
     ${eps.length ? `<div class="features">
-      <h4>Features</h4>
+      <h4>${esc(t('featuresTitle'))}</h4>
       ${eps.map((ep, i) => `<div class="feature" id="ep-${i}">
         <div class="feature-num">${i + 1}</div>
         <div><b>${esc(ep.title)}</b><p>${esc(ep.desc)}</p>${tagsHtml(ep.tags)}</div>
@@ -369,11 +405,11 @@ function openDemo(id) {
   const p = DATA.projects.find(x => x.id === id);
   if (!p || !hasDemo(p)) return;
   const note = p.prototype
-    ? 'Protótipo com dados fictícios: toque nos cards, nas abas e no chat, ou arraste para os lados para trocar de tela.'
-    : `${esc(p.demoNote || 'Versão web real do app, rodando no seu navegador.')} <a href="${esc(p.demo)}" target="_blank" rel="noopener" style="text-decoration:underline">Abrir em tela cheia ↗</a>`;
+    ? esc(t('protoNote'))
+    : `${esc(p.demoNote || t('liveNote'))} <a href="${esc(p.demo)}" target="_blank" rel="noopener" style="text-decoration:underline">${esc(t('openFull'))}</a>`;
   showModal(`
     <div class="demo-stage">
-      <h3 id="modal-title" style="margin:0 0 20px">${esc(p.title)}: ${p.prototype ? 'protótipo interativo' : 'demo ao vivo'}</h3>
+      <h3 id="modal-title" style="margin:0 0 20px">${esc(p.title)}: ${esc(p.prototype ? t('protoTitle') : t('liveTitle'))}</h3>
       ${phoneHtml(p, true)}
       <p class="demo-note">${note}</p>
     </div>`, p.accent);

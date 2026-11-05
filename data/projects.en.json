@@ -1,0 +1,426 @@
+{
+  "owner": {
+    "name": "Josué Cobucci Leal",
+    "role": "Mobile & Full-stack Developer",
+    "bio": "Building apps end to end: from a secure database to the final interface.",
+    "github": "https://github.com/josucobucci",
+    "linkedin": "https://www.linkedin.com/in/josuecobucci/"
+  },
+  "projects": [
+    {
+      "id": "zip4zip",
+      "title": "ZIP4ZIP",
+      "featured": true,
+      "year": 2026,
+      "status": "In development",
+      "category": "Mobile App",
+      "accent": "#16A34A",
+      "tagline": "B2B wholesale stock marketplace, \"Selling in large volumes\".",
+      "description": "Companies list what they have in stock or what they are looking for, find nearby offers by location, chat in real time and close orders. All protected, stress-free.",
+      "tags": [
+        "React Native",
+        "Expo",
+        "TypeScript",
+        "Supabase",
+        "PostgreSQL",
+        "Realtime"
+      ],
+      "repo": null,
+      "demo": null,
+      "prototype": true,
+      "features": [
+        {
+          "title": "Proximity discovery",
+          "desc": "Each listing stores the phone's location. Distance is calculated with the Haversine formula and the list is sorted from nearest to farthest.",
+          "tags": [
+            "expo-location",
+            "Haversine"
+          ]
+        },
+        {
+          "title": "Real-time chat",
+          "desc": "Conversations per product and buyer using Supabase Realtime (postgres_changes). Messages arrive instantly, with auto-scroll.",
+          "tags": [
+            "Supabase Realtime",
+            "WebSockets"
+          ]
+        },
+        {
+          "title": "Push straight from Postgres",
+          "desc": "A database trigger uses the pg_net extension to call the Expo push API on every new message, with no extra server.",
+          "tags": [
+            "pg_net",
+            "Triggers",
+            "Expo Push"
+          ]
+        },
+        {
+          "title": "Server-side search + infinite scroll",
+          "desc": "A SQL RPC function filters by name, city, price and distance, sorts and paginates. In the app, search waits for the user to stop typing (debounce) and the list loads more items on demand.",
+          "tags": [
+            "RPC",
+            "Pagination",
+            "Debounce"
+          ]
+        },
+        {
+          "title": "Orders with two-layer validation",
+          "desc": "The app validates the quantity and, on top of that, a Postgres trigger rejects any order larger than the stock, even if someone bypasses the app.",
+          "tags": [
+            "Triggers",
+            "Business rules"
+          ]
+        },
+        {
+          "title": "Sell × Seek",
+          "desc": "Buyer and seller roles flip depending on the listing type. The security policies (RLS) were rewritten to cover both directions.",
+          "tags": [
+            "RLS",
+            "Data modeling"
+          ]
+        },
+        {
+          "title": "Admin panel",
+          "desc": "Stats and management of products, companies and orders. Includes fixing an infinite recursion in RLS policies with a security definer function.",
+          "tags": [
+            "RLS",
+            "security definer"
+          ]
+        },
+        {
+          "title": "Product photos",
+          "desc": "Pick an image from the gallery with a preview, upload to Supabase Storage with access policies, and edit listings.",
+          "tags": [
+            "Supabase Storage",
+            "expo-image-picker"
+          ]
+        },
+        {
+          "title": "Quality: i18n, tests and CI",
+          "desc": "Interface in Portuguese and English, automated tests with Jest and type checking running on GitHub Actions on every pull request.",
+          "tags": [
+            "i18next",
+            "Jest",
+            "GitHub Actions"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clubix",
+      "title": "Clubix",
+      "year": 2026,
+      "status": "In development",
+      "category": "Web · Real time",
+      "accent": "#A3274C",
+      "prototype": true,
+      "related": [
+        "hal"
+      ],
+      "relation": "Clubix is the customer service hub; HAL is the intelligence that handles first contact inside it. When HAL doesn't know the answer, it hands the conversation to the Clubix queue, and unanswered questions become \"official answers\" that the team registers in the Clubix panel for HAL to use.",
+      "tagline": "In-house customer service hub, with real-time chat, a smart queue and AI on first contact.",
+      "description": "Customer service platform for Clube dos Funcionários: real-time chat, a queue with automatic distribution, a visual flow editor and integrated telephony. First contact is handled by HAL, and a human agent can take over at any time.",
+      "tags": [
+        "Python",
+        "Django",
+        "Django Channels",
+        "PostgreSQL",
+        "Redis",
+        "Docker",
+        "Rust",
+        "WebSockets",
+        "VoIP SIP"
+      ],
+      "repo": null,
+      "features": [
+        {
+          "title": "Real-time chat",
+          "desc": "WebSocket conversations with Django Channels and Redis. Messages reach customer and agent instantly, without reloading the page.",
+          "tags": [
+            "Django Channels",
+            "Redis",
+            "WebSockets"
+          ]
+        },
+        {
+          "title": "Queue with automatic distribution",
+          "desc": "Each agent has a limit of simultaneous conversations, and distribution gives priority to logged-in members.",
+          "tags": [
+            "Queue",
+            "Business rules"
+          ]
+        },
+        {
+          "title": "Visual flow editor",
+          "desc": "Customer service is built from blocks (message, menu, condition, AI, queue), with no coding. You can test the flow before publishing.",
+          "tags": [
+            "No-code",
+            "UX"
+          ]
+        },
+        {
+          "title": "Agent dashboard",
+          "desc": "Real-time notifications, image sending and conversation transfer between agents.",
+          "tags": [
+            "Real time",
+            "Notifications"
+          ]
+        },
+        {
+          "title": "Join the queue without logging in",
+          "desc": "Anyone can join the queue with just a name. Members sign in with their membership number and get priority.",
+          "tags": [
+            "Queue",
+            "Priority"
+          ]
+        },
+        {
+          "title": "Agents watch HAL live",
+          "desc": "The \"With AI\" tab shows HAL's ongoing conversations. The agent watches without interfering and can take over at any time.",
+          "tags": [
+            "AI",
+            "Real time"
+          ]
+        },
+        {
+          "title": "Notices and carousel on the portal",
+          "desc": "Editor for notices and a carousel shown at the chat entrance, for club announcements.",
+          "tags": [
+            "Django",
+            "Editor"
+          ]
+        },
+        {
+          "title": "Light and dark theme",
+          "desc": "Responsive interface for customers, with a dark theme option across the whole system.",
+          "tags": [
+            "CSS",
+            "Accessibility"
+          ]
+        },
+        {
+          "title": "Message templates with shortcuts",
+          "desc": "Canned replies triggered by shortcuts (like /horario), for faster, consistent service.",
+          "tags": [
+            "Productivity"
+          ]
+        },
+        {
+          "title": "Internal chat and contact book",
+          "desc": "Conversations and groups between agents plus a team contact book, in the same tool.",
+          "tags": [
+            "Internal chat",
+            "Groups"
+          ]
+        },
+        {
+          "title": "Built-in extension dialing",
+          "desc": "Agents call internal extensions straight from the dashboard, integrated with VoIP SIP telephony.",
+          "tags": [
+            "VoIP SIP",
+            "Integration"
+          ]
+        },
+        {
+          "title": "Three-level access control",
+          "desc": "Agent, editor and administrator, each with the permissions they need and nothing more.",
+          "tags": [
+            "Permissions",
+            "Security"
+          ]
+        },
+        {
+          "title": "Archiving with a Rust compressor",
+          "desc": "Old conversations are archived and compressed automatically, with an integrity check before the original is deleted.",
+          "tags": [
+            "Rust",
+            "Data integrity"
+          ]
+        },
+        {
+          "title": "HAL administration",
+          "desc": "Unanswered questions become official answers, and opening hours and contacts change without a deploy. The panel controls the AI assistant.",
+          "tags": [
+            "Django",
+            "AI management"
+          ]
+        },
+        {
+          "title": "Quality: 320 tests",
+          "desc": "A suite of 320 automated tests that run without any network dependency.",
+          "tags": [
+            "Automated tests"
+          ]
+        }
+      ],
+      "art": "assets/clubix/logo-selo.svg",
+      "gallery": [
+        {
+          "src": "assets/telas/atendente-02-conversa.png",
+          "title": "Conversation in progress"
+        },
+        {
+          "src": "assets/telas/atendente-03-com-a-ia.png",
+          "title": "\"With AI\" tab: watching HAL live"
+        },
+        {
+          "src": "assets/telas/atendente-07-discagem.png",
+          "title": "Extension dialing (VoIP SIP)"
+        },
+        {
+          "src": "assets/telas/admin-03-fluxo.png",
+          "title": "Chatbot flow editor"
+        },
+        {
+          "src": "assets/telas/cliente-03-carol.png",
+          "title": "Member chat on mobile",
+          "kind": "mobile"
+        }
+      ]
+    },
+    {
+      "id": "hal",
+      "title": "HAL",
+      "year": 2026,
+      "status": "Evolving",
+      "category": "AI · Agent",
+      "accent": "#F0B54A",
+      "prototype": true,
+      "related": [
+        "clubix"
+      ],
+      "relation": "HAL works inside Clubix. It queries the intranet portal through tools and, when unsure, hands the conversation to an agent in the Clubix queue.",
+      "tagline": "Virtual assistant with tool use, model routing, security and observability.",
+      "description": "Virtual assistant for Clube dos Funcionários (formerly called Lara). It evolved from two local models running on CPU into an agent that uses the Anthropic API with prompt caching, tools, routing by topic, security filters and per-question metrics.",
+      "tags": [
+        "Python",
+        "Claude API",
+        "Prompt Caching",
+        "Tool Use",
+        "Flask",
+        "SQLite",
+        "Observability"
+      ],
+      "repo": null,
+      "features": [
+        {
+          "title": "Version 1: 100% local AI, CPU only",
+          "desc": "Qwen 2.5 (7B) handled the conversation, a 3B model rewrote the questions and RAG used nomic-embed-text embeddings via Ollama. It worked, but averaged ~10 s and peaked at ~51 s per answer.",
+          "tags": [
+            "Ollama",
+            "Qwen 2.5",
+            "RAG"
+          ]
+        },
+        {
+          "title": "From RAG to prompt caching",
+          "desc": "The full bylaws, board and mission (~67k tokens) live in the cached system prompt. On our own test set: answers in ~1.5 to ~4.5 s, ~US$ 0.001 per question and accuracy from 77% to ~100%. The local backend remains as a rollback.",
+          "tags": [
+            "Prompt Caching",
+            "Claude API"
+          ]
+        },
+        {
+          "title": "Tool use instead of injected context",
+          "desc": "The model decides when to call tools (activities, notices, system guides). If the person lacks permission, the guide text never reaches the LLM. Before, irrelevant injected context made the model refuse what it knew (6/6 refusals vs 0/6 without it).",
+          "tags": [
+            "Tool Use",
+            "Permissions"
+          ]
+        },
+        {
+          "title": "Model routing by topic",
+          "desc": "Laws and bylaws go to Sonnet 5.5 (medium effort) and everything else to Haiku 5.5 (low). A rule-based router decides with no extra latency, and a safety net retries on the larger model if Haiku cites an article. Cost: ~US$ 0.001 vs ~US$ 0.02 per question.",
+          "tags": [
+            "Routing",
+            "Cost"
+          ]
+        },
+        {
+          "title": "Security and privacy",
+          "desc": "Input and output filters, neutralized data delimiters and tool output treated as data, never as instructions. 37 attack cases (leetspeak, homoglyphs, base64, fiction, crescendo) with no prompt leakage.",
+          "tags": [
+            "Prompt injection",
+            "Security"
+          ]
+        },
+        {
+          "title": "Observability",
+          "desc": "One event per question in SQLite, with masked CPF, email and phone, hashed user and 90-day retention. p50/p95 latency, cost per model, refusals and topic classified by an LLM in the background (~US$ 0.00005).",
+          "tags": [
+            "SQLite",
+            "Metrics",
+            "LGPD"
+          ]
+        },
+        {
+          "title": "Continuous improvement through Clubix",
+          "desc": "Unanswered questions become \"official answers\", injected into the prompt with their own cache. Opening hours and contacts are editable in the Clubix panel, with no deploy.",
+          "tags": [
+            "Django",
+            "Prompt Caching"
+          ]
+        },
+        {
+          "title": "HAL management panel",
+          "desc": "Overview, performance, questions, topics, costs, audit, official answers and configuration. Includes a heatmap of when people ask and a daily spending cap.",
+          "tags": [
+            "Django",
+            "Metrics",
+            "Cost"
+          ]
+        },
+        {
+          "title": "Evaluation and quality",
+          "desc": "121 evaluation cases against the real endpoint, 193 offline tests, a staging instance and replay of real questions before every deploy.",
+          "tags": [
+            "Evaluation",
+            "Staging",
+            "Tests"
+          ]
+        },
+        {
+          "title": "Intranet portal integration",
+          "desc": "HAL runs on Flask, Gunicorn and systemd and consumes the activities, notices and guides APIs of the Laravel portal, with contracts agreed with the portal team.",
+          "tags": [
+            "Laravel",
+            "Flask",
+            "Gunicorn",
+            "systemd"
+          ]
+        }
+      ],
+      "art": "assets/hal/mascote.png",
+      "gallery": [
+        {
+          "src": "assets/telas/cliente-03-carol.png",
+          "title": "HAL chatting with a member",
+          "kind": "mobile"
+        },
+        {
+          "src": "assets/telas/atendente-03-com-a-ia.png",
+          "title": "The agent follows HAL's conversation"
+        },
+        {
+          "src": "assets/telas/hal-painel-visao-geral.png",
+          "title": "AI panel: overview"
+        },
+        {
+          "src": "assets/telas/hal-painel-sem-resposta.png",
+          "title": "AI panel: unanswered questions"
+        },
+        {
+          "src": "assets/telas/hal-painel-respostas-oficiais.png",
+          "title": "AI panel: official answers"
+        }
+      ]
+    }
+  ],
+  "comingSoon": [
+    {
+      "title": "Clubix on WhatsApp",
+      "tagline": "Integration with the WhatsApp Business Cloud API (Meta), in development.",
+      "accent": "#25D366"
+    }
+  ]
+}

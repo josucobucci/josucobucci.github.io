@@ -1,0 +1,426 @@
+{
+  "owner": {
+    "name": "Josué Cobucci Leal",
+    "role": "Desarrollador Mobile & Full-stack",
+    "bio": "Construcción de apps de punta a punta: desde una base de datos segura hasta la interfaz final.",
+    "github": "https://github.com/josucobucci",
+    "linkedin": "https://www.linkedin.com/in/josuecobucci/"
+  },
+  "projects": [
+    {
+      "id": "zip4zip",
+      "title": "ZIP4ZIP",
+      "featured": true,
+      "year": 2026,
+      "status": "En desarrollo",
+      "category": "App móvil",
+      "accent": "#16A34A",
+      "tagline": "Marketplace B2B de stock al por mayor, \"Venta en grandes volúmenes\".",
+      "description": "Las empresas publican lo que tienen en stock o lo que buscan, encuentran ofertas cercanas por ubicación, conversan en tiempo real y cierran pedidos. Todo protegido, sin estrés.",
+      "tags": [
+        "React Native",
+        "Expo",
+        "TypeScript",
+        "Supabase",
+        "PostgreSQL",
+        "Realtime"
+      ],
+      "repo": null,
+      "demo": null,
+      "prototype": true,
+      "features": [
+        {
+          "title": "Descubrimiento por cercanía",
+          "desc": "Cada anuncio guarda la ubicación del celular. La distancia se calcula con la fórmula de Haversine y la lista se ordena de la más cercana a la más lejana.",
+          "tags": [
+            "expo-location",
+            "Haversine"
+          ]
+        },
+        {
+          "title": "Chat en tiempo real",
+          "desc": "Conversaciones por producto y comprador con Supabase Realtime (postgres_changes). Los mensajes llegan al instante, con desplazamiento automático.",
+          "tags": [
+            "Supabase Realtime",
+            "WebSockets"
+          ]
+        },
+        {
+          "title": "Push directo desde Postgres",
+          "desc": "Un trigger en la base de datos usa la extensión pg_net para llamar a la API de push de Expo con cada mensaje nuevo, sin servidor adicional.",
+          "tags": [
+            "pg_net",
+            "Triggers",
+            "Expo Push"
+          ]
+        },
+        {
+          "title": "Búsqueda en el servidor + scroll infinito",
+          "desc": "Una función RPC en SQL filtra por nombre, ciudad, precio y distancia, ordena y pagina. En la app, la búsqueda espera a que el usuario deje de escribir (debounce) y la lista carga más elementos bajo demanda.",
+          "tags": [
+            "RPC",
+            "Paginación",
+            "Debounce"
+          ]
+        },
+        {
+          "title": "Pedidos con validación en dos capas",
+          "desc": "La app valida la cantidad y, además, un trigger en Postgres rechaza cualquier pedido mayor que el stock, aunque alguien eluda la app.",
+          "tags": [
+            "Triggers",
+            "Reglas de negocio"
+          ]
+        },
+        {
+          "title": "Venta × Búsqueda",
+          "desc": "Los roles de comprador y vendedor se invierten según el tipo de anuncio. Las políticas de seguridad (RLS) se reescribieron para cubrir ambos sentidos.",
+          "tags": [
+            "RLS",
+            "Modelado"
+          ]
+        },
+        {
+          "title": "Panel administrativo",
+          "desc": "Estadísticas y gestión de productos, empresas y pedidos. Incluye la corrección de una recursión infinita en políticas RLS con una función security definer.",
+          "tags": [
+            "RLS",
+            "security definer"
+          ]
+        },
+        {
+          "title": "Fotos de producto",
+          "desc": "Selección de imagen de la galería con vista previa, subida a Supabase Storage con políticas de acceso y edición de anuncios.",
+          "tags": [
+            "Supabase Storage",
+            "expo-image-picker"
+          ]
+        },
+        {
+          "title": "Calidad: i18n, pruebas y CI",
+          "desc": "Interfaz en portugués e inglés, pruebas automatizadas con Jest y verificación de tipos en GitHub Actions en cada pull request.",
+          "tags": [
+            "i18next",
+            "Jest",
+            "GitHub Actions"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clubix",
+      "title": "Clubix",
+      "year": 2026,
+      "status": "En desarrollo",
+      "category": "Web · Tiempo real",
+      "accent": "#A3274C",
+      "prototype": true,
+      "related": [
+        "hal"
+      ],
+      "relation": "Clubix es la central de atención; HAL es la inteligencia que hace la primera atención dentro de ella. Cuando HAL no sabe responder, transfiere la conversación a la cola de Clubix, y las preguntas sin respuesta se convierten en \"respuestas oficiales\" que el equipo registra en el panel de Clubix para que HAL las use.",
+      "tagline": "Central de atención propia, con chat en tiempo real, cola inteligente e IA en el primer contacto.",
+      "description": "Plataforma de atención del Clube dos Funcionários: chat en tiempo real, cola con distribución automática, editor visual de flujos y telefonía integrada. La primera atención la hace HAL, y un agente humano puede intervenir en cualquier momento.",
+      "tags": [
+        "Python",
+        "Django",
+        "Django Channels",
+        "PostgreSQL",
+        "Redis",
+        "Docker",
+        "Rust",
+        "WebSockets",
+        "VoIP SIP"
+      ],
+      "repo": null,
+      "features": [
+        {
+          "title": "Chat en tiempo real",
+          "desc": "Conversaciones por WebSocket con Django Channels y Redis. Los mensajes llegan al instante al cliente y al agente, sin recargar la página.",
+          "tags": [
+            "Django Channels",
+            "Redis",
+            "WebSockets"
+          ]
+        },
+        {
+          "title": "Cola con distribución automática",
+          "desc": "Cada agente tiene un límite de conversaciones simultáneas, y la distribución da prioridad a los socios con sesión iniciada.",
+          "tags": [
+            "Cola",
+            "Reglas de negocio"
+          ]
+        },
+        {
+          "title": "Editor visual de flujos",
+          "desc": "La atención se arma con bloques (mensaje, menú, condición, IA, cola), sin programar. Se puede probar el flujo antes de publicarlo.",
+          "tags": [
+            "No-code",
+            "UX"
+          ]
+        },
+        {
+          "title": "Panel del agente",
+          "desc": "Notificaciones en tiempo real, envío de imágenes y transferencia de conversaciones entre agentes.",
+          "tags": [
+            "Tiempo real",
+            "Notificaciones"
+          ]
+        },
+        {
+          "title": "Entrada a la cola sin login",
+          "desc": "Cualquier persona entra a la cola solo con su nombre. Los socios entran con su número de matrícula y tienen prioridad.",
+          "tags": [
+            "Cola",
+            "Prioridad"
+          ]
+        },
+        {
+          "title": "El agente sigue a HAL en vivo",
+          "desc": "La pestaña \"Con la IA\" muestra las conversaciones de HAL en curso. El agente observa sin intervenir y puede tomar el control cuando quiera.",
+          "tags": [
+            "IA",
+            "Tiempo real"
+          ]
+        },
+        {
+          "title": "Avisos y carrusel en el portal",
+          "desc": "Editor de avisos y de un carrusel que aparecen en la entrada del chat, para comunicados del club.",
+          "tags": [
+            "Django",
+            "Editor"
+          ]
+        },
+        {
+          "title": "Tema claro y oscuro",
+          "desc": "Interfaz responsiva para el cliente, con opción de tema oscuro en todo el sistema.",
+          "tags": [
+            "CSS",
+            "Accesibilidad"
+          ]
+        },
+        {
+          "title": "Plantillas de mensaje con atajos",
+          "desc": "Respuestas predefinidas llamadas por atajos (como /horario), para atender más rápido y de forma uniforme.",
+          "tags": [
+            "Productividad"
+          ]
+        },
+        {
+          "title": "Chat interno y agenda de contactos",
+          "desc": "Conversaciones y grupos entre agentes y una agenda de contactos del equipo, en la misma herramienta.",
+          "tags": [
+            "Chat interno",
+            "Grupos"
+          ]
+        },
+        {
+          "title": "Marcación de extensiones integrada",
+          "desc": "El agente llama a las extensiones directamente desde el panel, integrado con la telefonía VoIP SIP.",
+          "tags": [
+            "VoIP SIP",
+            "Integración"
+          ]
+        },
+        {
+          "title": "Control de acceso en tres niveles",
+          "desc": "Agente, editor y administrador, cada uno con los permisos que necesita y nada más.",
+          "tags": [
+            "Permisos",
+            "Seguridad"
+          ]
+        },
+        {
+          "title": "Archivado con compresor en Rust",
+          "desc": "Las conversaciones antiguas se archivan y comprimen automáticamente, con verificación de integridad antes de borrar el original.",
+          "tags": [
+            "Rust",
+            "Integridad de datos"
+          ]
+        },
+        {
+          "title": "Administración de HAL",
+          "desc": "Las preguntas sin respuesta se convierten en respuestas oficiales, y los horarios y contactos cambian sin deploy. El panel controla el asistente de IA.",
+          "tags": [
+            "Django",
+            "Gestión de IA"
+          ]
+        },
+        {
+          "title": "Calidad: 320 pruebas",
+          "desc": "Una suite de 320 pruebas automatizadas que se ejecutan sin depender de la red.",
+          "tags": [
+            "Pruebas automatizadas"
+          ]
+        }
+      ],
+      "art": "assets/clubix/logo-selo.svg",
+      "gallery": [
+        {
+          "src": "assets/telas/atendente-02-conversa.png",
+          "title": "Conversación en atención"
+        },
+        {
+          "src": "assets/telas/atendente-03-com-a-ia.png",
+          "title": "Pestaña \"Con la IA\": siguiendo a HAL en vivo"
+        },
+        {
+          "src": "assets/telas/atendente-07-discagem.png",
+          "title": "Marcación de extensiones (VoIP SIP)"
+        },
+        {
+          "src": "assets/telas/admin-03-fluxo.png",
+          "title": "Editor de flujo del chatbot"
+        },
+        {
+          "src": "assets/telas/cliente-03-carol.png",
+          "title": "Chat del socio en el celular",
+          "kind": "mobile"
+        }
+      ]
+    },
+    {
+      "id": "hal",
+      "title": "HAL",
+      "year": 2026,
+      "status": "En evolución",
+      "category": "IA · Agente",
+      "accent": "#F0B54A",
+      "prototype": true,
+      "related": [
+        "clubix"
+      ],
+      "relation": "HAL atiende dentro de Clubix. Consulta el portal de la intranet mediante herramientas y, cuando no está seguro, entrega la conversación a un agente de la cola de Clubix.",
+      "tagline": "Asistente virtual con tool use, enrutamiento de modelos, seguridad y observabilidad.",
+      "description": "Asistente virtual del Clube dos Funcionários (antes llamado Lara). Evolucionó de dos modelos locales en CPU a un agente que usa la API de Anthropic con prompt caching, herramientas, enrutamiento por tema, filtros de seguridad y métricas por pregunta.",
+      "tags": [
+        "Python",
+        "Claude API",
+        "Prompt Caching",
+        "Tool Use",
+        "Flask",
+        "SQLite",
+        "Observabilidad"
+      ],
+      "repo": null,
+      "features": [
+        {
+          "title": "Versión 1: IA 100% local, solo CPU",
+          "desc": "Qwen 2.5 (7B) conversaba, un modelo de 3B reescribía las preguntas y el RAG usaba embeddings nomic-embed-text vía Ollama. Funcionaba, pero con un promedio de ~10 s y un máximo de ~51 s por respuesta.",
+          "tags": [
+            "Ollama",
+            "Qwen 2.5",
+            "RAG"
+          ]
+        },
+        {
+          "title": "Del RAG al prompt caching",
+          "desc": "Los estatutos, la directiva y la misión completos (~67 mil tokens) están en el prompt de sistema, en caché. En nuestro propio conjunto de pruebas: respuestas de ~1,5 a ~4,5 s, ~US$ 0,001 por pregunta y aciertos del 77% al ~100%. El backend local queda como rollback.",
+          "tags": [
+            "Prompt Caching",
+            "Claude API"
+          ]
+        },
+        {
+          "title": "Tool use en lugar de contexto inyectado",
+          "desc": "El modelo decide cuándo llamar herramientas (actividades, avisos, guías del sistema). Si la persona no tiene permiso, el texto de la guía ni llega al LLM. Antes, el contexto irrelevante inyectado hacía que el modelo rechazara lo que sabía (6/6 rechazos frente a 0/6 sin él).",
+          "tags": [
+            "Tool Use",
+            "Permisos"
+          ]
+        },
+        {
+          "title": "Enrutamiento de modelo por tema",
+          "desc": "Leyes y estatutos van a Sonnet 5.5 (esfuerzo medium) y el resto a Haiku 5.5 (low). Un enrutador por reglas decide sin latencia extra, y una red de seguridad repite en el modelo mayor si Haiku cita un artículo. Costo: ~US$ 0,001 frente a ~US$ 0,02 por pregunta.",
+          "tags": [
+            "Enrutamiento",
+            "Costo"
+          ]
+        },
+        {
+          "title": "Seguridad y privacidad",
+          "desc": "Filtros de entrada y salida, delimitadores de datos neutralizados y la salida de herramientas tratada como dato, nunca como instrucción. 37 casos de ataque (leetspeak, homoglifos, base64, ficción, crescendo) sin filtrar el prompt.",
+          "tags": [
+            "Prompt injection",
+            "Seguridad"
+          ]
+        },
+        {
+          "title": "Observabilidad",
+          "desc": "Un evento por pregunta en SQLite, con CPF, correo y teléfono enmascarados, usuario en hash y retención de 90 días. Latencia p50/p95, costo por modelo, rechazos y tema clasificado por un LLM en segundo plano (~US$ 0,00005).",
+          "tags": [
+            "SQLite",
+            "Métricas",
+            "LGPD"
+          ]
+        },
+        {
+          "title": "Mejora continua desde Clubix",
+          "desc": "Las preguntas sin respuesta se convierten en \"respuestas oficiales\", inyectadas en el prompt con caché propia. Horarios y contactos se editan en el panel de Clubix, sin deploy.",
+          "tags": [
+            "Django",
+            "Prompt Caching"
+          ]
+        },
+        {
+          "title": "Panel de gestión de HAL",
+          "desc": "Visión general, rendimiento, preguntas, temas, costos, auditoría, respuestas oficiales y configuración. Incluye un mapa de calor de cuándo preguntan y un tope diario de gasto.",
+          "tags": [
+            "Django",
+            "Métricas",
+            "Costo"
+          ]
+        },
+        {
+          "title": "Evaluación y calidad",
+          "desc": "121 casos de evaluación contra el endpoint real, 193 pruebas sin red, una instancia de staging y replay de preguntas reales antes de cada deploy.",
+          "tags": [
+            "Evaluación",
+            "Staging",
+            "Pruebas"
+          ]
+        },
+        {
+          "title": "Integración con el portal de la intranet",
+          "desc": "HAL corre en Flask, Gunicorn y systemd y consume las APIs de actividades, avisos y guías del portal en Laravel, con contratos acordados con el equipo del portal.",
+          "tags": [
+            "Laravel",
+            "Flask",
+            "Gunicorn",
+            "systemd"
+          ]
+        }
+      ],
+      "art": "assets/hal/mascote.png",
+      "gallery": [
+        {
+          "src": "assets/telas/cliente-03-carol.png",
+          "title": "HAL conversando con un socio",
+          "kind": "mobile"
+        },
+        {
+          "src": "assets/telas/atendente-03-com-a-ia.png",
+          "title": "El agente sigue la conversación de HAL"
+        },
+        {
+          "src": "assets/telas/hal-painel-visao-geral.png",
+          "title": "Panel de IA: visión general"
+        },
+        {
+          "src": "assets/telas/hal-painel-sem-resposta.png",
+          "title": "Panel de IA: preguntas sin respuesta"
+        },
+        {
+          "src": "assets/telas/hal-painel-respostas-oficiais.png",
+          "title": "Panel de IA: respuestas oficiales"
+        }
+      ]
+    }
+  ],
+  "comingSoon": [
+    {
+      "title": "Clubix en WhatsApp",
+      "tagline": "Integración con la WhatsApp Business Cloud API (Meta), en desarrollo.",
+      "accent": "#25D366"
+    }
+  ]
+}

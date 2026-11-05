@@ -117,8 +117,8 @@
 .cx-role { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px; border-radius: 10px; background: var(--surface2); color: var(--text); }
 .cx-role span { flex: 1; font-weight: 600; }
 .cx-role em { font-style: normal; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 99px; background: var(--surface); color: var(--muted); }
-.cx-role em.Editor { background: var(--amber-bg); color: var(--amber-tx); }
-.cx-role em.Administrador { background: var(--a); color: #fff; }
+.cx-role em.r-ed { background: var(--amber-bg); color: var(--amber-tx); }
+.cx-role em.r-adm { background: var(--a); color: #fff; }
 .cx-arch { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .cx-arch div { background: var(--surface2); border-radius: 10px; padding: 10px; }
 .cx-arch strong { display: block; font-size: 17px; color: var(--a2); }

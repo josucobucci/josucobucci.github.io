@@ -26,6 +26,14 @@ Tudo vem de [`data/projects.json`](data/projects.json):
 - `related` e `relation`: ids de projetos que funcionam juntos e o texto que explica a relação.
 - `comingSoon[]`: projetos anunciados que ainda não têm conteúdo.
 
+## Idiomas (português, inglês e espanhol)
+
+- O site escolhe o idioma por `?lang=pt|en|es` na URL, depois pela escolha salva no navegador e, por fim, pelo idioma do navegador. O botão de tradução no topo troca o idioma.
+- Links para compartilhar: `/en/` (inglês) e `/es/` (espanhol).
+- **Conteúdo dos projetos:** `data/projects.json` (pt), `data/projects.en.json` e `data/projects.es.json`. Ao editar um projeto, atualize os três.
+- **Textos da interface:** `i18n.js`.
+- **Textos dos protótipos:** objeto `I18N` no topo de `prototype.js`, `proto-clubix.js` e `proto-hal.js`.
+
 ## Publicar no GitHub Pages
 
 1. Crie um repositório público chamado **`josucobucci.github.io`**.
