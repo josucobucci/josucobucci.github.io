@@ -4,7 +4,7 @@
     "role": "Desenvolvedor Mobile & Full-stack",
     "bio": "Construção de apps ponta a ponta: do banco de dados seguro até a interface final.",
     "github": "https://github.com/josucobucci",
-    "linkedin": ""
+    "linkedin": "https://www.linkedin.com/in/josuecobucci/"
   },
   "projects": [
     {
@@ -17,56 +17,94 @@
       "accent": "#16A34A",
       "tagline": "Marketplace B2B de estoque por atacado, \"Venda em grandes volumes\".",
       "description": "Empresas anunciam o que têm em estoque ou o que estão procurando, encontram ofertas próximas pela localização, conversam em tempo real e fecham pedidos. Tudo protegido, sem estresse.",
-      "tags": ["React Native", "Expo", "TypeScript", "Supabase", "PostgreSQL", "Realtime"],
+      "tags": [
+        "React Native",
+        "Expo",
+        "TypeScript",
+        "Supabase",
+        "PostgreSQL",
+        "Realtime"
+      ],
       "repo": "https://github.com/josucobucci/ZIP4ZIP",
-      "demo": null,
+      "demo": "/demos/zip4zip/",
       "episodes": [
         {
           "title": "Descoberta por proximidade",
           "desc": "Cada anúncio guarda a localização do celular. A distância é calculada pela fórmula de Haversine e a lista é ordenada do mais perto pro mais longe.",
-          "tags": ["expo-location", "Haversine"]
+          "tags": [
+            "expo-location",
+            "Haversine"
+          ]
         },
         {
           "title": "Chat em tempo real",
           "desc": "Conversas por produto e comprador usando Supabase Realtime (postgres_changes). Mensagens chegam na hora, com rolagem automática.",
-          "tags": ["Supabase Realtime", "WebSockets"]
+          "tags": [
+            "Supabase Realtime",
+            "WebSockets"
+          ]
         },
         {
           "title": "Push direto do Postgres",
           "desc": "Uma trigger no banco usa a extensão pg_net para chamar a API de push da Expo a cada nova mensagem, sem precisar de servidor extra.",
-          "tags": ["pg_net", "Triggers", "Expo Push"]
+          "tags": [
+            "pg_net",
+            "Triggers",
+            "Expo Push"
+          ]
         },
         {
           "title": "Busca no servidor + rolagem infinita",
           "desc": "Uma função RPC em SQL filtra por nome, cidade, preço e distância, ordena e pagina. No app, a busca espera o usuário parar de digitar (debounce) e a lista carrega mais itens sob demanda.",
-          "tags": ["RPC", "Paginação", "Debounce"]
+          "tags": [
+            "RPC",
+            "Paginação",
+            "Debounce"
+          ]
         },
         {
           "title": "Pedidos com validação em duas camadas",
           "desc": "O app valida a quantidade e, além disso, uma trigger no Postgres recusa qualquer pedido maior que o estoque, mesmo que alguém contorne o app.",
-          "tags": ["Triggers", "Regras de negócio"]
+          "tags": [
+            "Triggers",
+            "Regras de negócio"
+          ]
         },
         {
           "title": "Venda × Procura",
           "desc": "Os papéis de comprador e vendedor se invertem conforme o tipo de anúncio. As políticas de segurança (RLS) foram reescritas para cobrir os dois sentidos.",
-          "tags": ["RLS", "Modelagem"]
+          "tags": [
+            "RLS",
+            "Modelagem"
+          ]
         },
         {
           "title": "Painel administrativo",
           "desc": "Estatísticas e gestão de produtos, empresas e pedidos. Inclui a correção de uma recursão infinita em políticas RLS usando uma função security definer.",
-          "tags": ["RLS", "security definer"]
+          "tags": [
+            "RLS",
+            "security definer"
+          ]
         },
         {
           "title": "Fotos de produto",
           "desc": "Escolha de imagem da galeria com pré-visualização, upload para o Supabase Storage com políticas de acesso e edição de anúncios.",
-          "tags": ["Supabase Storage", "expo-image-picker"]
+          "tags": [
+            "Supabase Storage",
+            "expo-image-picker"
+          ]
         },
         {
           "title": "Qualidade: i18n, testes e CI",
           "desc": "Interface em português e inglês, testes automatizados com Jest e verificação de tipos rodando no GitHub Actions a cada pull request.",
-          "tags": ["i18next", "Jest", "GitHub Actions"]
+          "tags": [
+            "i18next",
+            "Jest",
+            "GitHub Actions"
+          ]
         }
-      ]
+      ],
+      "demoNote": "Versão web real do app, conectada ao banco de dados. Toque em \"Entrar como visitante\": os anúncios são de empresas fictícias."
     }
   ],
   "comingSoon": [
