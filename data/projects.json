@@ -105,13 +105,233 @@
         }
       ],
       "prototype": true
+    },
+    {
+      "id": "clubix",
+      "title": "Clubix",
+      "year": 2026,
+      "status": "Em desenvolvimento",
+      "category": "Web · Tempo real",
+      "accent": "#2563EB",
+      "prototype": true,
+      "related": [
+        "hal"
+      ],
+      "relation": "O Clubix é a central de atendimento; o HAL é a inteligência que faz o primeiro atendimento dentro dela. Quando o HAL não sabe responder, ele transfere para a fila do Clubix, e as perguntas sem resposta viram \"respostas oficiais\" que o time cadastra no painel do Clubix para o HAL passar a usar.",
+      "tagline": "Central de atendimento própria, com chat em tempo real, fila inteligente e IA no primeiro contato.",
+      "description": "Plataforma de atendimento do Clube dos Funcionários: chat em tempo real, fila com distribuição automática, editor visual de fluxos e telefonia integrada. O primeiro atendimento é feito pelo HAL, e um atendente humano pode assumir a qualquer momento.",
+      "tags": [
+        "Python",
+        "Django",
+        "Django Channels",
+        "PostgreSQL",
+        "Redis",
+        "Docker",
+        "Rust",
+        "WebSockets",
+        "VoIP SIP"
+      ],
+      "repo": null,
+      "episodes": [
+        {
+          "title": "Chat em tempo real",
+          "desc": "Conversas por WebSocket com Django Channels e Redis. As mensagens chegam na hora para cliente e atendente, sem recarregar a página.",
+          "tags": [
+            "Django Channels",
+            "Redis",
+            "WebSockets"
+          ]
+        },
+        {
+          "title": "Fila com distribuição automática",
+          "desc": "Cada atendente tem um limite de conversas simultâneas, e a distribuição dá prioridade a associados logados.",
+          "tags": [
+            "Fila",
+            "Regras de negócio"
+          ]
+        },
+        {
+          "title": "Editor visual de fluxos",
+          "desc": "O atendimento é montado em blocos (mensagem, menu, condição, IA, fila), sem programar. Dá pra testar o fluxo antes de publicar.",
+          "tags": [
+            "No-code",
+            "UX"
+          ]
+        },
+        {
+          "title": "Painel do atendente",
+          "desc": "Notificações em tempo real, envio de imagens e transferência de conversa entre atendentes.",
+          "tags": [
+            "Tempo real",
+            "Notificações"
+          ]
+        },
+        {
+          "title": "Modelos de mensagem com atalhos",
+          "desc": "Respostas prontas chamadas por atalhos (como /horario), para atender mais rápido e com padrão.",
+          "tags": [
+            "Produtividade"
+          ]
+        },
+        {
+          "title": "Chat interno e agenda de contatos",
+          "desc": "Conversas e grupos entre atendentes e uma agenda de contatos da equipe, na mesma ferramenta.",
+          "tags": [
+            "Chat interno",
+            "Grupos"
+          ]
+        },
+        {
+          "title": "Discagem de ramais integrada",
+          "desc": "O atendente liga para os ramais direto do painel, integrado à telefonia VoIP SIP.",
+          "tags": [
+            "VoIP SIP",
+            "Integração"
+          ]
+        },
+        {
+          "title": "Controle de acesso em três níveis",
+          "desc": "Atendente, editor e administrador, cada um com as permissões que precisa e nada além disso.",
+          "tags": [
+            "Permissões",
+            "Segurança"
+          ]
+        },
+        {
+          "title": "Arquivamento com compressor em Rust",
+          "desc": "Conversas antigas são arquivadas e comprimidas automaticamente, com verificação de integridade antes de apagar o original.",
+          "tags": [
+            "Rust",
+            "Integridade de dados"
+          ]
+        },
+        {
+          "title": "Administração do HAL",
+          "desc": "Perguntas sem resposta viram respostas oficiais, e horários e contatos mudam sem deploy. O painel controla o assistente de IA.",
+          "tags": [
+            "Django",
+            "Gestão de IA"
+          ]
+        },
+        {
+          "title": "Qualidade: 320 testes",
+          "desc": "Suíte de 320 testes automatizados que rodam sem depender de rede.",
+          "tags": [
+            "Testes automatizados"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hal",
+      "title": "HAL",
+      "year": 2026,
+      "status": "Em evolução",
+      "category": "IA · Agente",
+      "accent": "#06B6D4",
+      "prototype": true,
+      "related": [
+        "clubix"
+      ],
+      "relation": "O HAL atende dentro do Clubix. Ele consulta o portal da intranet por ferramentas e, quando não tem certeza, entrega a conversa para um atendente da fila do Clubix.",
+      "tagline": "Assistente virtual com tool use, roteamento de modelos, segurança e observabilidade.",
+      "description": "Assistente virtual do Clube dos Funcionários (antes chamado Lara). Evoluiu de dois modelos locais rodando em CPU para um agente que usa a API da Anthropic com prompt caching, ferramentas, roteamento por assunto, filtros de segurança e métricas por pergunta.",
+      "tags": [
+        "Python",
+        "Claude API",
+        "Prompt Caching",
+        "Tool Use",
+        "Flask",
+        "SQLite",
+        "Observabilidade"
+      ],
+      "repo": null,
+      "episodes": [
+        {
+          "title": "Versão 1: IA 100% local, só CPU",
+          "desc": "Qwen 2.5 (7B) conversava, um modelo de 3B reescrevia as perguntas e o RAG usava embeddings nomic-embed-text via Ollama. Funcionava, mas com média de ~10 s e máxima de ~51 s por resposta.",
+          "tags": [
+            "Ollama",
+            "Qwen 2.5",
+            "RAG"
+          ]
+        },
+        {
+          "title": "Do RAG ao prompt caching",
+          "desc": "Estatuto, diretoria e missão inteiros (~67 mil tokens) ficam no prompt de sistema, em cache. No conjunto de testes próprio: respostas de ~1,5 a ~4,5 s, ~US$ 0,001 por pergunta e acerto de 77% para ~100%. O backend local segue como rollback.",
+          "tags": [
+            "Prompt Caching",
+            "Claude API"
+          ]
+        },
+        {
+          "title": "Tool Use no lugar de contexto injetado",
+          "desc": "O modelo decide quando chamar ferramentas (atividades, avisos, guias do sistema). Se a pessoa não tem permissão, o texto do guia nem chega ao LLM. Antes, contexto irrelevante injetado fazia o modelo recusar o que sabia (6/6 recusas contra 0/6 sem ele).",
+          "tags": [
+            "Tool Use",
+            "Permissões"
+          ]
+        },
+        {
+          "title": "Roteamento de modelo por assunto",
+          "desc": "Leis e estatuto vão para o Sonnet 5.5 (esforço medium) e o resto para o Haiku 5.5 (low). Um roteador por regras decide sem latência extra, e uma rede de segurança refaz no modelo maior se o Haiku citar um artigo. Custo: ~US$ 0,001 contra ~US$ 0,02 por pergunta.",
+          "tags": [
+            "Roteamento",
+            "Custo"
+          ]
+        },
+        {
+          "title": "Segurança e privacidade",
+          "desc": "Filtros de entrada e saída, delimitadores de dados neutralizados e retorno de ferramenta tratado como dado, não instrução. 37 casos de ataque (leetspeak, homóglifos, base64, ficção, crescendo) sem vazar o prompt.",
+          "tags": [
+            "Prompt injection",
+            "Segurança"
+          ]
+        },
+        {
+          "title": "Observabilidade",
+          "desc": "Um evento por pergunta no SQLite, com CPF, e-mail e telefone mascarados, usuário em hash e retenção de 90 dias. Latência p50/p95, custo por modelo, recusas e assunto classificado por LLM em segundo plano (~US$ 0,00005).",
+          "tags": [
+            "SQLite",
+            "Métricas",
+            "LGPD"
+          ]
+        },
+        {
+          "title": "Melhoria contínua pelo Clubix",
+          "desc": "As perguntas sem resposta viram \"respostas oficiais\", injetadas no prompt com cache próprio. Horários e contatos são editáveis no painel do Clubix, sem deploy.",
+          "tags": [
+            "Django",
+            "Prompt Caching"
+          ]
+        },
+        {
+          "title": "Avaliação e qualidade",
+          "desc": "121 casos de avaliação contra o endpoint real, 193 testes sem rede, instância de staging e replay de perguntas reais antes de cada deploy.",
+          "tags": [
+            "Avaliação",
+            "Staging",
+            "Testes"
+          ]
+        },
+        {
+          "title": "Integração com o portal da intranet",
+          "desc": "O HAL roda em Flask, Gunicorn e systemd e consome as APIs de atividades, avisos e guias do portal em Laravel, com contratos alinhados com o time do portal.",
+          "tags": [
+            "Laravel",
+            "Flask",
+            "Gunicorn",
+            "systemd"
+          ]
+        }
+      ]
     }
   ],
   "comingSoon": [
     {
-      "title": "Clubix / Lara",
-      "tagline": "Próximo projeto do catálogo.",
-      "accent": "#7C3AED"
+      "title": "Clubix no WhatsApp",
+      "tagline": "Integração com a WhatsApp Business Cloud API (Meta), em desenvolvimento.",
+      "accent": "#25D366"
     }
   ]
 }

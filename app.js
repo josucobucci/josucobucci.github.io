@@ -79,10 +79,12 @@ function renderHero(p) {
 
 // Protótipos interativos montados na página (ver prototype.js). Um por área (banner e modal).
 const protoInstances = new WeakMap();
+const PROTOTYPES = () => ({ zip4zip: typeof ZipPrototype !== 'undefined' && ZipPrototype, clubix: typeof ClubixPrototype !== 'undefined' && ClubixPrototype, hal: typeof HalPrototype !== 'undefined' && HalPrototype });
 function mountProtos(scope) {
   scope.querySelectorAll('[data-proto]').forEach(host => {
-    if (typeof ZipPrototype === 'undefined' || protoInstances.has(host)) return;
-    const inst = ZipPrototype.mount(host);
+    const proto = PROTOTYPES()[host.dataset.proto];
+    if (!proto || protoInstances.has(host)) return;
+    const inst = proto.mount(host);
     protoInstances.set(host, inst);
     const btn = host.closest('.proto-wrap, .hero-visual')?.querySelector('[data-tour]');
     host.addEventListener('tourstart', () => { if (btn) btn.textContent = '■ Parar tour'; });
@@ -255,7 +257,7 @@ function openProject(id, epIndex) {
       <h3 id="modal-title">${esc(p.title)}</h3>
       <div class="actions">
         ${demoButton(p)}
-        <a class="btn btn-ghost" href="${esc(p.repo)}" target="_blank" rel="noopener">${ICONS.github} Código no GitHub</a>
+        ${p.repo ? `<a class="btn btn-ghost" href="${esc(p.repo)}" target="_blank" rel="noopener">${ICONS.github} Código no GitHub</a>` : `<span class="btn btn-ghost" aria-disabled="true" title="O código deste projeto é privado">🔒 Código privado</span>`}
       </div>
     </div>
     <div class="modal-content">
@@ -271,6 +273,10 @@ function openProject(id, epIndex) {
         <div><span>Categoria: </span><b>${esc(p.category)}</b></div>
       </div>
     </div>
+    ${(p.related || []).map(rid => DATA.projects.find(x => x.id === rid)).filter(Boolean).map(r => `<div class="related">
+      <small>Funciona junto com</small>
+      <button class="related-card" style="--c:${esc(r.accent)}" data-open="${esc(r.id)}"><b>${esc(r.title)}</b><span>${esc(r.tagline)}</span><em>Ver projeto ›</em></button>
+      ${p.relation ? `<p>${esc(p.relation)}</p>` : ''}</div>`).join('')}
     ${eps.length ? `<div class="episodes">
       <h4>Features</h4>
       ${eps.map((ep, i) => `<div class="episode" id="ep-${i}">
