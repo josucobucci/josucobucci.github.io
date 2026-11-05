@@ -25,7 +25,7 @@
         "PostgreSQL",
         "Realtime"
       ],
-      "repo": "https://github.com/josucobucci/ZIP4ZIP",
+      "repo": null,
       "demo": null,
       "prototype": true,
       "features": [
